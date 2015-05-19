@@ -60,22 +60,10 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     private View mProgressView;
     private View mLoginFormView;
 
-    //YAN WEI's SHIT
-    private static String userId;
-    private Button anonButton;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        anonButton = (Button) findViewById(R.id.anonButton);
-        anonButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loginWithCurrentUser();
-            }
-        });
 
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -320,24 +308,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         }
     }
 
-    public void loginAsAnon () {
-        ParseAnonymousUtils.logIn(new LogInCallback() {
-            @Override
-            public void done(ParseUser parseUser, ParseException e) {
-                if (e != null) {
-                    Log.d("ANON LOGIN", "anon login failed: " + e.toString());
-                } else {
-                    loginWithCurrentUser();
-                }
-            }
-        });
-    }
-
-    private void loginWithCurrentUser() {
-        userId = ParseUser.getCurrentUser().getObjectId();
-        Intent chatIntent = new Intent(this, ChatActivity.class);
-        startActivity(chatIntent);
-    }
 }
 
 

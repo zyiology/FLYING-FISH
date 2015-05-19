@@ -53,3 +53,28 @@ public class ChatActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 }
+
+/*
+//YAN WEI's SHIT
+    private static String userId;
+    private Button anonButton;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+
+        anonButton = (Button) findViewById(R.id.anonButton);
+        anonButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loginWithCurrentUser();
+            }
+        });
+
+    private void loginWithCurrentUser() {
+        userId = ParseUser.getCurrentUser().getObjectId();
+        Intent chatIntent = new Intent(this, ChatActivity.class);
+        startActivity(chatIntent);
+    }
+ */
