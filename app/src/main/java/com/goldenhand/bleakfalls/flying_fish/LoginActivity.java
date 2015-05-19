@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentResolver;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -25,6 +26,15 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SignUpCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -138,15 +148,67 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            final ParseQuery<ParseUser> query = ParseUser.getQuery();
+            query.findInBackground(new FindCallback<ParseUser>() {
+                @Override
+                public void done(List<ParseUser> parseUserlist, ParseException e) {
+                    boolean existingUser = false;
+                    boolean correctPassword = false;
+                    String userId = "";
+                    System.out.println(parseUserlist.size());
+                    for (int i=0;i<parseUserlist.size();i++) {
+                        System.out.println(parseUserlist.get(i).getEmail());
+                        if (parseUserlist.get(i).getEmail().equals(mEmailView.getText().toString())) {
+                            existingUser = true;
+                            if (parseUserlist.get(i).getEmail().equals(mPasswordView.getText().toString())) {
+                                correctPassword = true;
+                                userId = parseUserlist.get(i).getObjectId();
+                            }
+                        }
+                    }
+                    if (existingUser==false) {
+                        //add new user
+                        System.out.println("ADDING NEW USER");
+                        ParseUser newUser = new ParseUser();
+                        newUser.setEmail(mEmailView.getText().toString());
+                        newUser.setUsername(mEmailView.getText().toString());
+                        newUser.setPassword(mPasswordView.getText().toString());
+                        final String objId = newUser.getObjectId();
+                        newUser.signUpInBackground(new SignUpCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e==null) {
+                                    Intent i = new Intent(getApplication(),FishActivity.class);
+                                    i.putExtra("USER_ID", objId);
+                                    startActivity(i);
+                                } else {
+                                    //TODO UPDATE THIS
+                                    mPasswordView.setError(getString(R.string.error_password_in_use));
+                                    mPasswordView.requestFocus();
+                                }
+                            }
+                        });
+                    }
+                    else if (existingUser==true && correctPassword==false) {
+                        mPasswordView.setError(getString(R.string.error_incorrect_password));
+                        mPasswordView.requestFocus();
+                    }
+                    else {
+                        Intent i = new Intent(getApplication(),FishActivity.class);
+                        i.putExtra("USER_ID", userId);
+                        startActivity(i);
+                    }
+                }
+            });
         }
     }
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
-        return email.contains("@");
+        if (!email.contains("@")) {
+            return email.contains("@");
+        }
+        return true;
     }
 
     private boolean isPasswordValid(String password) {
