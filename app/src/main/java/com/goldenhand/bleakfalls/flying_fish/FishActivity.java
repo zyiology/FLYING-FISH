@@ -144,7 +144,8 @@ public class FishActivity extends ActionBarActivity implements ActionBar.TabList
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch(position) {
                 case 0:
-                    return new GroupFragment();
+                    //return new GroupFragment();
+                    return PlaceholderFragment.newInstance(position + 1);
             }
             return PlaceholderFragment.newInstance(position + 1);
         }
