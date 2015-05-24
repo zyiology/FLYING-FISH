@@ -1,8 +1,12 @@
 package com.goldenhand.bleakfalls.flying_fish;
 
-import java.security.acl.Group;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
+import android.app.Activity;
+import android.app.ListFragment;
+import android.content.Context;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -11,13 +15,19 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
+
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 
 public class FishActivity extends ActionBarActivity implements ActionBar.TabListener {
@@ -36,6 +46,9 @@ public class FishActivity extends ActionBarActivity implements ActionBar.TabList
      * The {@link ViewPager} that will host the section contents.
      */
     ViewPager mViewPager;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,7 +144,7 @@ public class FishActivity extends ActionBarActivity implements ActionBar.TabList
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch(position) {
                 case 0:
-                    return PlaceholderFragment.newInstance(position+1);
+                    return new GroupFragment();
             }
             return PlaceholderFragment.newInstance(position + 1);
         }
@@ -154,20 +167,6 @@ public class FishActivity extends ActionBarActivity implements ActionBar.TabList
                     return getString(R.string.title_section3).toUpperCase(l);
             }
             return null;
-        }
-    }
-
-    public static class GroupFragment extends Fragment {
-        private static final String ARG_SECTION_NUMBER = "section_number";
-        public static GroupFragment newInstance(int sectionNumber) {
-            GroupFragment fragment = new GroupFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-        public GroupFragment() {
-
         }
     }
 
@@ -199,9 +198,8 @@ public class FishActivity extends ActionBarActivity implements ActionBar.TabList
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_fish, container, false);
+            View rootView = inflater.inflate(R.layout.fragment_fish_groups, container, false);
             return rootView;
         }
     }
-
 }
