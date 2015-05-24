@@ -68,6 +68,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private EditText mUsernameView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +78,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
+
+        mUsernameView = (EditText) findViewById(R.id.username);
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -120,9 +123,11 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
+        mUsernameView.setError(null);
 
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
+        String username = mUsernameView.getText().toString();
         String password = mPasswordView.getText().toString();
 
         boolean cancel = false;
@@ -135,6 +140,14 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             focusView = mPasswordView;
             cancel = true;
         }
+
+        if (TextUtils.isEmpty(username)) {
+            mUsernameView.setError(getString(R.string.error_invalid_username));
+            focusView = mUsernameView;
+            cancel = true;
+        }
+
+        //if ()
 
         // Check for a valid email address.
         if (TextUtils.isEmpty(email)) {
@@ -157,7 +170,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             final ParseQuery<ParseUser> query = ParseUser.getQuery();
             query.findInBackground(new FindCallback<ParseUser>() {
                 @Override
-                public void done(List<ParseUser> parseUserlist, ParseException e) {
+                public void done(final List<ParseUser> parseUserlist, ParseException e) {
                     boolean existingUser = false;
                     boolean correctPassword = false;
                     String userId = "";
@@ -177,7 +190,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                         System.out.println("ADDING NEW USER");
                         ParseUser newUser = new ParseUser();
                         newUser.setEmail(mEmailView.getText().toString());
-                        newUser.setUsername(mEmailView.getText().toString());
+                        newUser.setUsername(mUsernameView.getText().toString());
                         newUser.setPassword(mPasswordView.getText().toString());
                         final String objId = newUser.getObjectId();
                         newUser.signUpInBackground(new SignUpCallback() {
@@ -189,8 +202,23 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                                     startActivity(i);
                                 } else {
                                     //TODO UPDATE THIS
-                                    mPasswordView.setError(getString(R.string.error_password_in_use));
-                                    mPasswordView.requestFocus();
+                                    boolean requestedFocus = false;
+                                    for (int i=0;i<parseUserlist.size();i++) {
+                                        if (parseUserlist.get(i).getEmail().equals(mEmailView.getText().toString())) {
+                                            mEmailView.setError(getString(R.string.error_email_in_use));
+                                            mEmailView.requestFocus();
+                                            requestedFocus=true;
+                                        }
+                                        else if (parseUserlist.get(i).getUsername().equals(mUsernameView.getText().toString())) {
+                                            mUsernameView.setError(getString(R.string.error_username_in_use));
+                                            mUsernameView.requestFocus();
+                                            requestedFocus=true;
+                                        }
+                                    }
+                                    if (!requestedFocus) {
+                                        mPasswordView.setError(getString(R.string.error_password_in_use));
+                                        mPasswordView.requestFocus();
+                                    }
                                 }
                             }
                         });
@@ -214,6 +242,10 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         if (!email.contains("@")) {
             return email.contains("@");
         }
+        return true;
+    }
+
+    private boolean isUsernameValid(String username) {
         return true;
     }
 
