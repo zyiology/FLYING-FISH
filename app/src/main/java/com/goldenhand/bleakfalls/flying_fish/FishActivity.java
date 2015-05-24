@@ -1,5 +1,6 @@
 package com.goldenhand.bleakfalls.flying_fish;
 
+import java.security.acl.Group;
 import java.util.Locale;
 
 import android.support.v7.app.ActionBarActivity;
@@ -153,6 +154,20 @@ public class FishActivity extends ActionBarActivity implements ActionBar.TabList
                     return getString(R.string.title_section3).toUpperCase(l);
             }
             return null;
+        }
+    }
+
+    public static class GroupFragment extends Fragment {
+        private static final String ARG_SECTION_NUMBER = "section_number";
+        public static GroupFragment newInstance(int sectionNumber) {
+            GroupFragment fragment = new GroupFragment();
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            fragment.setArguments(args);
+            return fragment;
+        }
+        public GroupFragment() {
+
         }
     }
 
