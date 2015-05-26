@@ -29,7 +29,7 @@ public class ChatActivity extends ActionBarActivity {
             public void onClick(View v) {
                 String data = messageET.getText().toString();
                 ParseObject message = new ParseObject("Message");
-                message.put(getIntent().get)
+                //message.put(getIntent().get)
             }
         });
 
