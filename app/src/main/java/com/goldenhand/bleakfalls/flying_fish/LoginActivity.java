@@ -73,6 +73,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     //Anon login
     private static String userId;
     private Button anonButton;
+    public static final String USER_ID = "User ID";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -241,7 +242,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                     }
                     else {
                         Intent i = new Intent(getApplication(),FishActivity.class);
-                        i.putExtra("USER_ID", userId);
+                        i.putExtra(USER_ID, userId);
                         startActivity(i);
                     }
                 }
