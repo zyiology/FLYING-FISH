@@ -70,6 +70,10 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     private View mLoginFormView;
     private EditText mUsernameView;
 
+    //Anon login
+    private static String userId;
+    private Button anonButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,6 +107,14 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        anonButton = (Button) findViewById(R.id.anonButton);
+        anonButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loginWithCurrentUser();
+            }
+        });
     }
 
     private void populateAutoComplete() {
@@ -399,6 +411,12 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             mAuthTask = null;
             showProgress(false);
         }
+    }
+
+    private void loginWithCurrentUser() {
+        userId = ParseUser.getCurrentUser().getObjectId();
+        Intent chatIntent = new Intent(this, ChatActivity.class);
+        startActivity(chatIntent);
     }
 
 }
