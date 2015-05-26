@@ -70,10 +70,11 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     private View mLoginFormView;
     private EditText mUsernameView;
 
-    //Anon login
+    //Anon login xxx
     private static String userId;
     private Button anonButton;
-    public static final String USER_ID = "User ID";
+    public static final String ANON_USER_ID = "userId";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -242,7 +243,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                     }
                     else {
                         Intent i = new Intent(getApplication(),FishActivity.class);
-                        i.putExtra(USER_ID, userId);
+                        i.putExtra("USER_ID", userId);
                         startActivity(i);
                     }
                 }
@@ -417,6 +418,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     private void loginWithCurrentUser() {
         userId = ParseUser.getCurrentUser().getObjectId();
         Intent chatIntent = new Intent(this, ChatActivity.class);
+        chatIntent.putExtra(ANON_USER_ID, userId);
         startActivity(chatIntent);
     }
 

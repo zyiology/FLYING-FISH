@@ -14,6 +14,9 @@ public class CatApplication extends Application {
         super.onCreate();
 
         Parse.enableLocalDatastore(this);
+
+        ParseObject.registerSubclass(Message.class);
+
         Parse.initialize(this, APPLICATION_ID, CLIENT_KEY);
 
         /*ParseObject testObject = new ParseObject("TestObject");
