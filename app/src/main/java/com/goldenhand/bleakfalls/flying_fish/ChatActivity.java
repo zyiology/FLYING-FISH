@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.parse.ParseObject;
+
 
 public class ChatActivity extends ActionBarActivity {
 
@@ -19,11 +21,15 @@ public class ChatActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        messageET = (EditText) findViewById(R.id.messageET);
+
 
         messageET.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                String data = messageET.getText().toString();
+                ParseObject message = new ParseObject("Message");
+                message.put(getIntent().get)
             }
         });
 
@@ -53,28 +59,3 @@ public class ChatActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 }
-
-/*
-//YAN WEI's SHIT
-    private static String userId;
-    private Button anonButton;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-
-        anonButton = (Button) findViewById(R.id.anonButton);
-        anonButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loginWithCurrentUser();
-            }
-        });
-
-    private void loginWithCurrentUser() {
-        userId = ParseUser.getCurrentUser().getObjectId();
-        Intent chatIntent = new Intent(this, ChatActivity.class);
-        startActivity(chatIntent);
-    }
- */
