@@ -70,10 +70,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     private View mLoginFormView;
     private EditText mUsernameView;
 
-    //Anon login xxx
+    //Anon login
     private static String userId;
     private Button anonButton;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
