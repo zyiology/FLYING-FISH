@@ -1,7 +1,9 @@
 package com.goldenhand.bleakfalls.flying_fish;
 
+import com.parse.ParseClassName;
 import com.parse.ParseObject;
 
+@ParseClassName("Message")
 public class Message extends ParseObject{
     public String getUserId() {
         return getString(LoginActivity.ANON_USER_ID);

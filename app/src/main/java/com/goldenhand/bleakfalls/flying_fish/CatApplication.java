@@ -12,10 +12,11 @@ public class CatApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        ParseObject.registerSubclass(Message.class);
 
         Parse.enableLocalDatastore(this);
 
-        ParseObject.registerSubclass(Message.class);
+
 
         Parse.initialize(this, APPLICATION_ID, CLIENT_KEY);
 
