@@ -29,7 +29,6 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
-
 public class FishActivity extends ActionBarActivity implements ActionBar.TabListener {
 
     /**
@@ -144,8 +143,10 @@ public class FishActivity extends ActionBarActivity implements ActionBar.TabList
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch(position) {
                 case 0:
-                    //return new GroupFragment();
-                    return PlaceholderFragment.newInstance(position + 1);
+                    GroupFragment gf = new GroupFragment();
+                    gf.newInstance(position+1);
+                    return gf;
+                    //return PlaceholderFragment.newInstance(position + 1);
             }
             return PlaceholderFragment.newInstance(position + 1);
         }
