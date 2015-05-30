@@ -28,14 +28,6 @@ public class GroupFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Group");
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> list, ParseException e) {
-                mGroupList = list;
-            }
-        });
     }
 
     public GroupFragment newInstance(int sectionNumber) {
@@ -53,11 +45,31 @@ public class GroupFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_fish_groups, container, false);
-        GroupAdapter mGroupAdapter = new GroupAdapter(getActivity(), R.layout.fragment_fish_groups_item,mGroupList);
-        ListView lv = (ListView) rootView.findViewById(R.id.groups_list);
-        lv.setAdapter(mGroupAdapter);
+        final View rootView = inflater.inflate(R.layout.fragment_fish_groups, container, false);
+        System.out.println("CREATING FRAGMENT");
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Group");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+                if (e==null) {
+                    mGroupList = list;
+                    System.out.println("DONNNNNNNNNNNNNNNNNNNNE");
+                    GroupAdapter mGroupAdapter = new GroupAdapter(getActivity(), R.layout.fragment_fish_groups_item,mGroupList);
+                    ListView lv = (ListView) rootView.findViewById(R.id.groups_list);
+                    lv.setAdapter(mGroupAdapter);
+                }
+                else {
+                    System.out.println("FAILURE U IDIOT");
+                }
+            }
+        });
+
+
+
+
         return rootView;
+
     }
 
     private class GroupAdapter extends ArrayAdapter<ParseObject> {

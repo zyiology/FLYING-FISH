@@ -12,4 +12,7 @@
     <!--ChatActivity-->
     <string name="send">Send</string>
 
+    <!--Chat Item-->
+    <string name="profile_me">My Profile Pic</string>
+    <string name="profile_other">Other Profile Pic</string>
 </resources>
