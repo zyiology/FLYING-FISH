@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -14,6 +15,7 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.SaveCallback;
 
 import java.util.List;
 
@@ -42,24 +44,25 @@ public class GroupFragment extends Fragment {
     }
 
 
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_fish_groups, container, false);
         System.out.println("CREATING FRAGMENT");
 
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Group");
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery("Group");
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> list, ParseException e) {
-                if (e==null) {
+                if (e == null) {
                     mGroupList = list;
+                    GroupAdapter mGroupAdapter = new GroupAdapter(getActivity(), R.layout.fragment_fish_groups_item, mGroupList);
                     System.out.println("DONNNNNNNNNNNNNNNNNNNNE");
-                    GroupAdapter mGroupAdapter = new GroupAdapter(getActivity(), R.layout.fragment_fish_groups_item,mGroupList);
                     ListView lv = (ListView) rootView.findViewById(R.id.groups_list);
                     lv.setAdapter(mGroupAdapter);
-                }
-                else {
+                } else {
                     System.out.println("FAILURE U IDIOT");
                 }
             }
@@ -67,8 +70,40 @@ public class GroupFragment extends Fragment {
 
 
 
+        Button mAddGroupButton = (Button) rootView.findViewById(R.id.add_group);
+        mAddGroupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ParseObject newGroup = new ParseObject("Group");
+                newGroup.put("Name", "New Group");
+                newGroup.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        query.findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(List<ParseObject> list, ParseException e) {
+                                if (e == null) {
+                                    mGroupList = list;
+                                    GroupAdapter mGroupAdapter = new GroupAdapter(getActivity(), R.layout.fragment_fish_groups_item, mGroupList);
+                                    System.out.println("DONNNNNNNNNNNNNNNNNNNNE");
+                                    ListView lv = (ListView) rootView.findViewById(R.id.groups_list);
+                                    lv.setAdapter(mGroupAdapter);
+                                } else {
+                                    System.out.println("FAILURE U IDIOT");
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+
+
 
         return rootView;
+
+
 
     }
 

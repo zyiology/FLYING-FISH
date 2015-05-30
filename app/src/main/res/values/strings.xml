@@ -2,9 +2,9 @@
 <resources>
 
     <string name="app_name">FLYING-FISH</string>
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
+    <string name="title_section1">Groups</string>
+    <string name="title_section2">Friends</string>
+    <string name="title_section3">Announcements</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_chat">ChatActivity</string>
@@ -15,4 +15,7 @@
     <!--Chat Item-->
     <string name="profile_me">My Profile Pic</string>
     <string name="profile_other">Other Profile Pic</string>
+
+    <!--GroupFragment-->
+    <string name="add_group">Add Group</string>
 </resources>

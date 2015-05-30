@@ -64,7 +64,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     private UserLoginTask mAuthTask = null;
 
     // UI references.
-    private AutoCompleteTextView mEmailView;
+    //private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
@@ -82,8 +82,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         setContentView(R.layout.activity_login);
 
         // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
-        populateAutoComplete();
+        //mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        //populateAutoComplete();
 
         mUsernameView = (EditText) findViewById(R.id.username);
 
@@ -135,12 +135,12 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         }
 
         // Reset errors.
-        mEmailView.setError(null);
+        //mEmailView.setError(null);
         mPasswordView.setError(null);
         mUsernameView.setError(null);
 
         // Store values at the time of the login attempt.
-        String email = mEmailView.getText().toString();
+        //String email = mEmailView.getText().toString();
         String username = mUsernameView.getText().toString();
         String password = mPasswordView.getText().toString();
 
@@ -164,7 +164,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         //if ()
 
         // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
+        /*if (TextUtils.isEmpty(email)) {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             cancel = true;
@@ -172,7 +172,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             cancel = true;
-        }
+        }*/
 
         if (cancel) {
             // There was an error; don't attempt login and focus the first
@@ -185,67 +185,55 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             query.findInBackground(new FindCallback<ParseUser>() {
                 @Override
                 public void done(final List<ParseUser> parseUserlist, ParseException e) {
-                    boolean existingUser = false;
-                    boolean correctPassword = false;
                     String userId = "";
                     System.out.println(parseUserlist.size());
-                    for (int i=0;i<parseUserlist.size();i++) {
+                    ParseUser.logInInBackground(mUsernameView.getText().toString(), mPasswordView.getText().toString(), new LogInCallback() {
+                        @Override
+                        public void done(ParseUser parseUser, ParseException e) {
+                            if (parseUser != null) {
+                                Intent i = new Intent(getApplication(), FishActivity.class);
+                                i.putExtra("USER_ID", parseUser.getObjectId());
+                                startActivity(i);
+                            } else {
+                                ParseUser newUser = new ParseUser();
+                                //newUser.setEmail(mEmailView.getText().toString());
+                                newUser.setUsername(mUsernameView.getText().toString());
+                                newUser.setPassword(mPasswordView.getText().toString());
+                                final String objId = newUser.getObjectId();
+                                newUser.signUpInBackground(new SignUpCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e == null) {
+                                            Intent i = new Intent(getApplication(), FishActivity.class);
+                                            i.putExtra("USER_ID", objId);
+                                            startActivity(i);
+                                        } else {
+                                            //TODO UPDATE THIS
+                                            for (int i = 0; i < parseUserlist.size(); i++) {
+                                                if (parseUserlist.get(i).getUsername().equals(mUsernameView.getText().toString())) {
+                                                    mUsernameView.setError(getString(R.string.error_username_in_use));
+                                                    mUsernameView.requestFocus();
+                                                } else {
+                                                    mPasswordView.setError(getString(R.string.error_password_in_use));
+                                                    mPasswordView.requestFocus();
+                                                }
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
+                    /*for (int i=0;i<parseUserlist.size();i++) {
                         System.out.println(parseUserlist.get(i).getEmail());
                         if (parseUserlist.get(i).getEmail().equals(mEmailView.getText().toString())) {
                             existingUser = true;
-                            if (parseUserlist.get(i).getEmail().equals(mPasswordView.getText().toString())) {
+                            if (parseUserlist.get(i).get.equals(mPasswordView.getText().toString())) {
                                 correctPassword = true;
                                 userId = parseUserlist.get(i).getObjectId();
                             }
                         }
-                    }
-                    if (existingUser==false) {
-                        //add new user
-                        System.out.println("ADDING NEW USER");
-                        ParseUser newUser = new ParseUser();
-                        newUser.setEmail(mEmailView.getText().toString());
-                        newUser.setUsername(mUsernameView.getText().toString());
-                        newUser.setPassword(mPasswordView.getText().toString());
-                        final String objId = newUser.getObjectId();
-                        newUser.signUpInBackground(new SignUpCallback() {
-                            @Override
-                            public void done(ParseException e) {
-                                if (e==null) {
-                                    Intent i = new Intent(getApplication(),FishActivity.class);
-                                    i.putExtra("USER_ID", objId);
-                                    startActivity(i);
-                                } else {
-                                    //TODO UPDATE THIS
-                                    boolean requestedFocus = false;
-                                    for (int i=0;i<parseUserlist.size();i++) {
-                                        if (parseUserlist.get(i).getEmail().equals(mEmailView.getText().toString())) {
-                                            mEmailView.setError(getString(R.string.error_email_in_use));
-                                            mEmailView.requestFocus();
-                                            requestedFocus=true;
-                                        }
-                                        else if (parseUserlist.get(i).getUsername().equals(mUsernameView.getText().toString())) {
-                                            mUsernameView.setError(getString(R.string.error_username_in_use));
-                                            mUsernameView.requestFocus();
-                                            requestedFocus=true;
-                                        }
-                                    }
-                                    if (!requestedFocus) {
-                                        mPasswordView.setError(getString(R.string.error_password_in_use));
-                                        mPasswordView.requestFocus();
-                                    }
-                                }
-                            }
-                        });
-                    }
-                    else if (existingUser==true && correctPassword==false) {
-                        mPasswordView.setError(getString(R.string.error_incorrect_password));
-                        mPasswordView.requestFocus();
-                    }
-                    else {
-                        Intent i = new Intent(getApplication(),FishActivity.class);
-                        i.putExtra("USER_ID", userId);
-                        startActivity(i);
-                    }
+                    }*/
                 }
             });
         }
@@ -355,7 +343,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                 new ArrayAdapter<String>(LoginActivity.this,
                         android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
-        mEmailView.setAdapter(adapter);
+        //mEmailView.setAdapter(adapter);
     }
 
     /**
