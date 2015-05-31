@@ -71,7 +71,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     private EditText mUsernameView;
 
     //Anon login xxx
-    private static String userId;
+    private static String userId = "";
     private Button anonButton;
     public static final String ANON_USER_ID = "userId";
     public static final String REGISTERED_USER_ID = "user Id that exists in database";
@@ -406,7 +406,17 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     }
 
     private void loginWithCurrentUser() {
-        userId = ParseUser.getCurrentUser().getObjectId();
+        ParseAnonymousUtils.logIn(new LogInCallback() {
+            @Override
+            public void done(ParseUser user, ParseException e) {
+                if (e != null) {
+                    Log.d("Login error", "Anonymous login failed: " + e.toString());
+                } else {
+                    userId = ParseUser.getCurrentUser().getObjectId();
+                }
+            }
+        });
+
         Intent chatIntent = new Intent(this, ChatActivity.class);
         chatIntent.putExtra(ANON_USER_ID, userId);
         startActivity(chatIntent);
