@@ -47,7 +47,8 @@ public class FishActivity extends ActionBarActivity implements ActionBar.TabList
     ViewPager mViewPager;
 
 
-
+    private static String mUserId;
+    private static boolean mIsRegistered;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +87,14 @@ public class FishActivity extends ActionBarActivity implements ActionBar.TabList
                     actionBar.newTab()
                             .setText(mSectionsPagerAdapter.getPageTitle(i))
                             .setTabListener(this));
+        }
+        if (getIntent().getExtras().containsKey(LoginActivity.REGISTERED_USER_ID)) {
+            mUserId = getIntent().getStringExtra(LoginActivity.REGISTERED_USER_ID);
+            mIsRegistered = true;
+        }
+        else {
+            mUserId = getIntent().getStringExtra(LoginActivity.ANON_USER_ID);
+            mIsRegistered = false;
         }
     }
 
@@ -144,7 +153,7 @@ public class FishActivity extends ActionBarActivity implements ActionBar.TabList
             switch(position) {
                 case 0:
                     GroupFragment gf = new GroupFragment();
-                    gf.newInstance(position+1);
+                    gf.newInstance(position+1,mUserId,mIsRegistered);
                     return gf;
                     //return PlaceholderFragment.newInstance(position + 1);
             }

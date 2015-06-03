@@ -30,14 +30,19 @@ public class GroupFragment extends Fragment {
     private final String ARG_SECTION_NUMBER = "section_number";
     static List<ParseObject> mGroupList;
 
+    private static String mUserId;
+    private static boolean mIsRegistered;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
-    public GroupFragment newInstance(int sectionNumber) {
+    public GroupFragment newInstance(int sectionNumber, String userID, boolean isRegistered) {
         GroupFragment fragment = new GroupFragment();
         Bundle args = new Bundle();
+        mUserId = userID;
+        mIsRegistered = isRegistered;
         args.putInt(ARG_SECTION_NUMBER, sectionNumber);
         fragment.setArguments(args);
         return fragment;
@@ -45,9 +50,6 @@ public class GroupFragment extends Fragment {
     public GroupFragment() {
 
     }
-
-
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -107,6 +109,12 @@ public class GroupFragment extends Fragment {
                 ParseObject group = (ParseObject) lv.getItemAtPosition(position);
                 Intent i = new Intent(getActivity(), EditGroupActivity.class);
                 i.putExtra(EditGroupActivity.GROUP_OBJECT_ID, group.getObjectId());
+                if (mIsRegistered) {
+                    i.putExtra(LoginActivity.REGISTERED_USER_ID,mUserId);
+                }
+                else {
+                    i.putExtra(LoginActivity.ANON_USER_ID,mUserId);
+                }
                 startActivity(i);
                 return true;
             }

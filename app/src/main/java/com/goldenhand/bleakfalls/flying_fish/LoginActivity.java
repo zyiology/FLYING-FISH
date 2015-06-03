@@ -74,6 +74,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     private static String userId;
     private Button anonButton;
     public static final String ANON_USER_ID = "userId";
+    public static final String REGISTERED_USER_ID = "user Id that exists in database";
+    public static final String IS_REGISTERED = "for use in other classes, check if user is logged in properly";
 
 
     @Override
@@ -192,7 +194,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                         public void done(ParseUser parseUser, ParseException e) {
                             if (parseUser != null) {
                                 Intent i = new Intent(getApplication(), FishActivity.class);
-                                i.putExtra("USER_ID", parseUser.getObjectId());
+                                i.putExtra(REGISTERED_USER_ID, parseUser.getObjectId());
                                 startActivity(i);
                             } else {
                                 ParseUser newUser = new ParseUser();

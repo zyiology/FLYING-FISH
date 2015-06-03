@@ -1,7 +1,9 @@
 package com.goldenhand.bleakfalls.flying_fish;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,7 +48,14 @@ public class EditGroupActivity extends ActionBarActivity {
                                 @Override
                                 public void done(ParseException e) {
                                     Toast.makeText(getApplicationContext(), "DONE", Toast.LENGTH_SHORT).show();
-                                    //TODO INTENT
+                                    Intent i = new Intent(getApplicationContext(),FishActivity.class);
+                                    if (getIntent().getExtras().containsKey(LoginActivity.REGISTERED_USER_ID)) {
+                                        i.putExtra(LoginActivity.REGISTERED_USER_ID, getIntent().getStringExtra(LoginActivity.REGISTERED_USER_ID));
+                                    }
+                                    else {
+                                        i.putExtra(LoginActivity.ANON_USER_ID, getIntent().getStringExtra(LoginActivity.ANON_USER_ID));
+                                    }
+                                    startActivity(i);
                                 }
                             });
                         }
