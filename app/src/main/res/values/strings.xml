@@ -18,4 +18,8 @@
 
     <!--GroupFragment-->
     <string name="add_group">Add Group</string>
+    <string name="title_activity_edit_group">EditGroupActivity</string>
+
+    <!--EditGroupActivity-->
+    <string name="save_changes">Save Changes</string>
 </resources>

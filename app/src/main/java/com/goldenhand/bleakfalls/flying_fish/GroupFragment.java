@@ -1,17 +1,20 @@
 package com.goldenhand.bleakfalls.flying_fish;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -69,7 +72,7 @@ public class GroupFragment extends Fragment {
         });
 
 
-
+        final ListView lv = (ListView) rootView.findViewById(R.id.groups_list);
         Button mAddGroupButton = (Button) rootView.findViewById(R.id.add_group);
         mAddGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,7 +89,6 @@ public class GroupFragment extends Fragment {
                                     mGroupList = list;
                                     GroupAdapter mGroupAdapter = new GroupAdapter(getActivity(), R.layout.fragment_fish_groups_item, mGroupList);
                                     System.out.println("DONNNNNNNNNNNNNNNNNNNNE");
-                                    ListView lv = (ListView) rootView.findViewById(R.id.groups_list);
                                     lv.setAdapter(mGroupAdapter);
                                 } else {
                                     System.out.println("FAILURE U IDIOT");
@@ -99,12 +101,18 @@ public class GroupFragment extends Fragment {
         });
 
 
-
+        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                ParseObject group = (ParseObject) lv.getItemAtPosition(position);
+                Intent i = new Intent(getActivity(), EditGroupActivity.class);
+                i.putExtra(EditGroupActivity.GROUP_OBJECT_ID, group.getObjectId());
+                startActivity(i);
+                return true;
+            }
+        });
 
         return rootView;
-
-
-
     }
 
     private class GroupAdapter extends ArrayAdapter<ParseObject> {
