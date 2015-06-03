@@ -5,6 +5,9 @@
     <string name="title_section1">Groups</string>
     <string name="title_section2">Friends</string>
     <string name="title_section3">Announcements</string>
+    <string name="title_section4">Group Chat</string>
+    <string name="title_section5">Announcements</string>
+    <string name="title_section6">Files and Images</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_chat">ChatActivity</string>
@@ -22,4 +25,8 @@
 
     <!--EditGroupActivity-->
     <string name="save_changes">Save Changes</string>
+    <string name="title_activity_group">GroupActivity</string>
+
+    <!--GroupDetailFragment-->
+    <string name="join_group">Join Group</string>
 </resources>

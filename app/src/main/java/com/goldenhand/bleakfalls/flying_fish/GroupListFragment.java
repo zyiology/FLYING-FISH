@@ -14,7 +14,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -26,7 +25,7 @@ import java.util.List;
  * Created by Default on 24/5/2015.
  */
 
-public class GroupFragment extends Fragment {
+public class GroupListFragment extends Fragment {
     private final String ARG_SECTION_NUMBER = "section_number";
     static List<ParseObject> mGroupList;
 
@@ -38,8 +37,8 @@ public class GroupFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-    public GroupFragment newInstance(int sectionNumber, String userID, boolean isRegistered) {
-        GroupFragment fragment = new GroupFragment();
+    public GroupListFragment newInstance(int sectionNumber, String userID, boolean isRegistered) {
+        GroupListFragment fragment = new GroupListFragment();
         Bundle args = new Bundle();
         mUserId = userID;
         mIsRegistered = isRegistered;
@@ -47,7 +46,7 @@ public class GroupFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-    public GroupFragment() {
+    public GroupListFragment() {
 
     }
 
@@ -99,6 +98,22 @@ public class GroupFragment extends Fragment {
                         });
                     }
                 });
+            }
+        });
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ParseObject group = (ParseObject) lv.getItemAtPosition(position);
+                Intent i = new Intent(getActivity(), GroupActivity.class);
+                i.putExtra(GroupActivity.GROUP_ID,group.getObjectId());
+                if (mIsRegistered) {
+                    i.putExtra(LoginActivity.REGISTERED_USER_ID, mUserId);
+                }
+                else {
+                    i.putExtra(LoginActivity.ANON_USER_ID,mUserId);
+                }
+                startActivity(i);
             }
         });
 
