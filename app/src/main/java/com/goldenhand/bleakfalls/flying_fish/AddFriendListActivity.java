@@ -36,7 +36,7 @@ public class AddFriendListActivity extends ActionBarActivity {
                     usernameLV.setAdapter(mUserAdapter);
                 }
             }
-         });
+        });
     }
 
     @Override
