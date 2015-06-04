@@ -152,6 +152,10 @@ public class FishActivity extends ActionBarActivity implements ActionBar.TabList
                     gf.newInstance(position+1,mUserId,mIsRegistered);
                     return gf;
                     //return PlaceholderFragment.newInstance(position + 1);
+                case 1:
+                    FriendListFragment flf = new FriendListFragment();
+                    flf.newInstance(position+1,mUserId,mIsRegistered);
+                    return flf;
             }
             return PlaceholderFragment.newInstance(position + 1);
         }

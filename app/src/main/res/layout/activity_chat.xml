@@ -5,7 +5,6 @@
     tools:context="${relativePackage}.${activityClass}" >
     <ListView
         android:id="@+id/chatLV"
-        android:transcriptMode="alwaysScroll"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"

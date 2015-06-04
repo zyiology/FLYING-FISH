@@ -30,7 +30,7 @@ public class GroupListFragment extends Fragment {
     static List<ParseObject> mGroupList;
 
     private static String mUserId;
-    private static boolean mIsRegistered;
+    private static Boolean mIsRegistered;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
