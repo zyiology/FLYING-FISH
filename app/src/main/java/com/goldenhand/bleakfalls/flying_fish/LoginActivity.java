@@ -201,6 +201,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                                 //newUser.setEmail(mEmailView.getText().toString());
                                 newUser.setUsername(mUsernameView.getText().toString());
                                 newUser.setPassword(mPasswordView.getText().toString());
+                                newUser.put("friends", new ArrayList<ParseUser>());
                                 final String objId = newUser.getObjectId();
                                 newUser.signUpInBackground(new SignUpCallback() {
                                     @Override

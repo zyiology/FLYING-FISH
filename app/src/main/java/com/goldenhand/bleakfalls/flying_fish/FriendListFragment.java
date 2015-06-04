@@ -2,6 +2,7 @@ package com.goldenhand.bleakfalls.flying_fish;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,13 +10,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import org.w3c.dom.Text;
 
@@ -24,8 +28,9 @@ import java.util.List;
 
 public class FriendListFragment extends Fragment {
     private final String ARG_SECTION_NUMBER = "friend list section number";
+    public static final int ADD_FRIEND_REQUEST = 1;
 
-    static List<ParseObject> mFriendList;
+    static List<ParseUser> mFriendList;
 
     private static String mUserId;
     private static Boolean mIsRegistered;
@@ -54,32 +59,35 @@ public class FriendListFragment extends Fragment {
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_friend_list, container, false);
 
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
-        query.whereEqualTo("objectId",mUserId);
-        query.findInBackground(new FindCallback<ParseObject>() {
+        ParseQuery<ParseUser> friendQuery = ParseUser.getQuery();
+        friendQuery.getInBackground(mUserId, new GetCallback<ParseUser>() {
             @Override
-            public void done(List<ParseObject> list, ParseException e) {
-               if (e == null) {
-                   if (list.size() != 0) {
-                       mFriendList = (List<ParseObject>) list.get(0).get("friends");
-                       FriendAdapter mFriendAdapter = new FriendAdapter(getActivity(), R.layout.fragment_friend_list_item, mFriendList);
-                       ListView friendsLV = (ListView) rootView.findViewById(R.id.friends_list);
-                       friendsLV.setAdapter(mFriendAdapter);
-                   }
-               } else {
-                   System.out.println("FAILURE U IDIOT");
-               }
+            public void done(ParseUser parseUser, ParseException e) {
+                mFriendList = (List<ParseUser>) parseUser.get("friends");
+                FriendAdapter mFriendAdapter = new FriendAdapter(getActivity(), R.layout.fragment_friend_list_item, mFriendList);
+                ListView friendsLV = (ListView) rootView.findViewById(R.id.friends_list);
+                friendsLV.setAdapter(mFriendAdapter);
+            }
+        });
+
+        Button mAddFriendButton = (Button) rootView.findViewById(R.id.add_friend);
+        mAddFriendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent addFriendIntent = new Intent(getActivity(), AddFriendListActivity.class);
+                addFriendIntent.putExtra(AddFriendListActivity.USER_ID, mUserId);
+                startActivityForResult(addFriendIntent, ADD_FRIEND_REQUEST);
             }
         });
 
         return rootView;
     }
 
-    private class FriendAdapter extends ArrayAdapter<ParseObject> {
-        List<ParseObject> mFriends;
+    private class FriendAdapter extends ArrayAdapter<ParseUser> {
+        List<ParseUser> mFriends;
         Context context;
 
-        public FriendAdapter(Context context, int resource, List<ParseObject> mFriends) {
+        public FriendAdapter(Context context, int resource, List<ParseUser> mFriends) {
             super(context, resource, mFriends);
             this.mFriends = mFriends;
             this.context = context;
@@ -87,17 +95,24 @@ public class FriendListFragment extends Fragment {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            final ViewHolder holder = new ViewHolder();
             if (convertView == null) {
-                LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.ACTIVITY_SERVICE);
+                LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 convertView = mInflater.inflate(R.layout.fragment_friend_list_item, null);
+
+                holder.friendName = (TextView)convertView.findViewById(R.id.friend_name);
+                convertView.setTag(holder);
             }
 
-            final ParseObject currentFriend = mFriends.get(position);
+            final ParseUser currentFriend = mFriends.get(position);
 
-            TextView friend = (TextView)convertView.findViewById(R.id.friend_name);
-            friend.setText(currentFriend.get("username").toString());
+            holder.friendName.setText(currentFriend.getUsername());
 
             return convertView;
+        }
+
+        final class ViewHolder {
+            private TextView friendName;
         }
     }
 }

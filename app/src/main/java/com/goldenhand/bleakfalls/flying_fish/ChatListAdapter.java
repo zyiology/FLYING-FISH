@@ -69,9 +69,9 @@ public class ChatListAdapter extends ArrayAdapter<Message> {
     }
 
     final class ViewHolder {
-        public ImageView imageLeft;
-        public ImageView imageRight;
-        public TextView body;
+        private ImageView imageLeft;
+        private ImageView imageRight;
+        private TextView body;
     }
 
 }

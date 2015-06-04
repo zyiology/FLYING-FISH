@@ -33,6 +33,10 @@
     <!--FriendListFragment-->
     <string name="add_friend">Add Friend</string>
 
+    <!--AddFriendList-->
+    <string name="choose_friend">Choose a friend</string>
+
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_add_friend_list">AddFriendListActivity</string>
 </resources>
