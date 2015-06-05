@@ -24,6 +24,7 @@ import com.parse.ParseUser;
 import org.w3c.dom.Text;
 
 import java.util.List;
+import java.util.ArrayList;
 
 
 public class FriendListFragment extends Fragment {
@@ -63,7 +64,8 @@ public class FriendListFragment extends Fragment {
         friendQuery.getInBackground(mUserId, new GetCallback<ParseUser>() {
             @Override
             public void done(ParseUser parseUser, ParseException e) {
-                mFriendList = (List<ParseUser>) parseUser.get("friends");
+                System.out.println("USER ID IN FLF: "+mUserId);
+                mFriendList = parseUser.getList("friends");
                 FriendAdapter mFriendAdapter = new FriendAdapter(getActivity(), R.layout.fragment_friend_list_item, mFriendList);
                 ListView friendsLV = (ListView) rootView.findViewById(R.id.friends_list);
                 friendsLV.setAdapter(mFriendAdapter);
@@ -100,9 +102,11 @@ public class FriendListFragment extends Fragment {
                 LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 convertView = mInflater.inflate(R.layout.fragment_friend_list_item, null);
 
-                holder.friendName = (TextView)convertView.findViewById(R.id.friend_name);
-                convertView.setTag(holder);
+
             }
+
+            holder.friendName = (TextView)convertView.findViewById(R.id.friend_name);
+            convertView.setTag(holder);
 
             final ParseUser currentFriend = mFriends.get(position);
 
