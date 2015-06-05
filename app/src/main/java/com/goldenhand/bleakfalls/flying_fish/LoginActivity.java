@@ -187,7 +187,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             query.findInBackground(new FindCallback<ParseUser>() {
                 @Override
                 public void done(final List<ParseUser> parseUserlist, ParseException e) {
-                    String userId = "";
                     System.out.println(parseUserlist.size());
                     ParseUser.logInInBackground(mUsernameView.getText().toString(), mPasswordView.getText().toString(), new LogInCallback() {
                         @Override

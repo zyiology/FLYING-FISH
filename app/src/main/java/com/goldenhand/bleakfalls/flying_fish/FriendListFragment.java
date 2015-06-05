@@ -64,6 +64,7 @@ public class FriendListFragment extends Fragment {
         friendQuery.getInBackground(mUserId, new GetCallback<ParseUser>() {
             @Override
             public void done(ParseUser parseUser, ParseException e) {
+                System.out.println("USER ID IN FLF: "+mUserId);
                 mFriendList = parseUser.getList("friends");
                 FriendAdapter mFriendAdapter = new FriendAdapter(getActivity(), R.layout.fragment_friend_list_item, mFriendList);
                 ListView friendsLV = (ListView) rootView.findViewById(R.id.friends_list);

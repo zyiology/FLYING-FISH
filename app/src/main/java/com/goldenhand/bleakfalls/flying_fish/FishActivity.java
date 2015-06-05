@@ -2,6 +2,7 @@ package com.goldenhand.bleakfalls.flying_fish;
 
 import java.util.Locale;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -84,13 +85,22 @@ public class FishActivity extends ActionBarActivity implements ActionBar.TabList
                             .setText(mSectionsPagerAdapter.getPageTitle(i))
                             .setTabListener(this));
         }
+
         if (getIntent().getExtras().containsKey(LoginActivity.REGISTERED_USER_ID)) {
             mUserId = getIntent().getStringExtra(LoginActivity.REGISTERED_USER_ID);
             mIsRegistered = true;
-        }
-        else {
+        } else {
             mUserId = getIntent().getStringExtra(LoginActivity.ANON_USER_ID);
             mIsRegistered = false;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == FriendListFragment.ADD_FRIEND_REQUEST) {
+            if (resultCode == RESULT_OK) {
+
+            }
         }
     }
 
@@ -155,6 +165,7 @@ public class FishActivity extends ActionBarActivity implements ActionBar.TabList
                 case 1:
                     FriendListFragment flf = new FriendListFragment();
                     flf.newInstance(position+1,mUserId,mIsRegistered);
+                    System.out.println("USER ID IN FISHACTIVITY: "+mUserId);
                     return flf;
             }
             return PlaceholderFragment.newInstance(position + 1);

@@ -1,5 +1,7 @@
 package com.goldenhand.bleakfalls.flying_fish;
 
+import android.content.Intent;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -74,11 +76,18 @@ public class AddFriendListActivity extends ActionBarActivity {
                     currentUser.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
-
+                            NavUtils.navigateUpTo(AddFriendListActivity.this, new Intent(AddFriendListActivity.this, FishActivity.class));
+                            Intent navigateUpIntent = new Intent();
+                            navigateUpIntent.putExtra(LoginActivity.REGISTERED_USER_ID, currentUser.getObjectId());
+                            setResult(RESULT_OK, navigateUpIntent);
+                            System.out.println("NAVIGATING BACK");
+                            finish();
                         }
                     });
+                } else {
 
                 }
+
             }
         });
     }
