@@ -197,18 +197,21 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                                 i.putExtra(REGISTERED_USER_ID, parseUser.getObjectId());
                                 startActivity(i);
                             } else {
-                                ParseUser newUser = new ParseUser();
+                                final ParseUser newUser = new ParseUser();
                                 //newUser.setEmail(mEmailView.getText().toString());
                                 newUser.setUsername(mUsernameView.getText().toString());
                                 newUser.setPassword(mPasswordView.getText().toString());
+<<<<<<< HEAD
                                 newUser.put("friends", new ArrayList<ParseUser>());
                                 final String objId = newUser.getObjectId();
+=======
+>>>>>>> origin/master
                                 newUser.signUpInBackground(new SignUpCallback() {
                                     @Override
                                     public void done(ParseException e) {
                                         if (e == null) {
                                             Intent i = new Intent(getApplication(), FishActivity.class);
-                                            i.putExtra("USER_ID", objId);
+                                            i.putExtra(REGISTERED_USER_ID, newUser.getObjectId());
                                             startActivity(i);
                                         } else {
                                             //TODO UPDATE THIS
