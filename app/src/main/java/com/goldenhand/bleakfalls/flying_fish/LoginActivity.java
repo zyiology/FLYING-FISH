@@ -201,11 +201,10 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                                 //newUser.setEmail(mEmailView.getText().toString());
                                 newUser.setUsername(mUsernameView.getText().toString());
                                 newUser.setPassword(mPasswordView.getText().toString());
-<<<<<<< HEAD
+
                                 newUser.put("friends", new ArrayList<ParseUser>());
                                 final String objId = newUser.getObjectId();
-=======
->>>>>>> origin/master
+
                                 newUser.signUpInBackground(new SignUpCallback() {
                                     @Override
                                     public void done(ParseException e) {
