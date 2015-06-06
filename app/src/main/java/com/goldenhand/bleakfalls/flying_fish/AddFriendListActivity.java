@@ -38,36 +38,36 @@ public class AddFriendListActivity extends ActionBarActivity {
         setContentView(R.layout.activity_add_friend_list);
 
         mUserId = getIntent().getStringExtra(USER_ID);
-        System.out.println("ADDFRIENDLIST USERID: "+mUserId);
+        System.out.println("ADDFRIENDLIST USERID: " + mUserId);
 
         ParseQuery<ParseUser> selfQuery = ParseUser.getQuery();
         selfQuery.getInBackground(mUserId, new GetCallback<ParseUser>() {
             @Override
             public void done(ParseUser parseUser, ParseException e) {
-                mFriends = parseUser.getList("friends");
-                System.out.println("SELFQUERY: "+mFriends);
+                mFriends = (List<ParseUser>) parseUser.get("friends");
+                System.out.println("SELFQUERY: " + mFriends);
                 currentUser = parseUser;
-            }
-        });
 
-        ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
-        userQuery.findInBackground(new FindCallback<ParseUser>() {
-            @Override
-            public void done(List<ParseUser> list, ParseException e) {
-                if (e == null) {
-                    mUserList = list;
-                    mUserList.remove(currentUser);
-                    if (mFriends != null) {
-                        for (ParseUser friend : mFriends) {
-                            mUserList.remove(friend);
+                ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
+                userQuery.findInBackground(new FindCallback<ParseUser>() {
+                    @Override
+                    public void done(List<ParseUser> list, ParseException e) {
+                        if (e == null) {
+                            mUserList = list;
+                            mUserList.remove(currentUser);
+                            if (mFriends != null) {
+                                for (ParseUser friend : mFriends) {
+                                    mUserList.remove(friend);
+                                }
+                            }
+                            System.out.println("USERQUERY: " + mFriends);
+                            UserAdapter mUserAdapter = new UserAdapter(AddFriendListActivity.this, R.layout.activity_add_friend_list_item, mUserList);
+                            usernameLV = (ListView) findViewById(R.id.username_list);
+                            usernameLV.setAdapter(mUserAdapter);
+                            setUpOnClick();
                         }
                     }
-                    System.out.println("USERQUERY: "+mFriends);
-                    UserAdapter mUserAdapter = new UserAdapter(AddFriendListActivity.this, R.layout.activity_add_friend_list_item, mUserList);
-                    usernameLV = (ListView) findViewById(R.id.username_list);
-                    usernameLV.setAdapter(mUserAdapter);
-                    setUpOnClick();
-                }
+                });
             }
         });
     }
