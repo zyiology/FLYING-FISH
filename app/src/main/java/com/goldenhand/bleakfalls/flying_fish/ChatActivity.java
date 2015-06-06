@@ -123,27 +123,13 @@ public class ChatActivity extends ActionBarActivity {
                 if (e == null) {
                     chatMessageArray = parseObject.getList("chatMessageArray");
 
-                    /*
-                    Collections.sort(chatMessageArray, new Comparator<ParseObject>() {
-                        @Override
-                        public int compare(ParseObject lhs, ParseObject rhs) {
-                            try{
-                                return lhs.fetchIfNeeded().getDate("createdAt").compareTo(rhs.fetchIfNeeded().getDate("createdAt"));
-                            } catch (ParseException e1) {
-                                e1.printStackTrace();
-                                return 0;
-                            }
-                        }
-                    });
-                    */
-
                     messageArrayList.clear();
                     messageArrayList.addAll(chatMessageArray);
                     chatListAdapter.notifyDataSetChanged();
                     chatLV.invalidate();
+                } else {
+                        System.out.println(e.getMessage());
                 }
-
-
             }
         });
     }
