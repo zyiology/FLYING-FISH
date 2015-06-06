@@ -36,11 +36,11 @@ public class FriendListFragment extends Fragment {
     private static String mUserId;
     private static Boolean mIsRegistered;
 
-    public FriendListFragment newInstance(int sectionNumber, String mUserId, boolean mIsRegistered) {
+    public FriendListFragment newInstance(int sectionNumber, String userId, boolean isRegistered) {
         FriendListFragment fragment = new FriendListFragment();
         Bundle args = new Bundle();
-        this.mUserId = mUserId;
-        this.mIsRegistered = mIsRegistered;
+        mUserId = userId;
+        mIsRegistered = isRegistered;
         args.putInt(ARG_SECTION_NUMBER,sectionNumber);
         fragment.setArguments(args);
         return fragment;
