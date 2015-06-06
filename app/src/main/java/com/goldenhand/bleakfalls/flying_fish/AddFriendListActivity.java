@@ -93,8 +93,6 @@ public class AddFriendListActivity extends ActionBarActivity {
                             finish();
                         }
                     });
-                } else {
-
                 }
 
             }

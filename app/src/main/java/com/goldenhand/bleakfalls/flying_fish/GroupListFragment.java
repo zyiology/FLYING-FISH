@@ -110,9 +110,6 @@ public class GroupListFragment extends Fragment {
                 if (mIsRegistered) {
                     i.putExtra(LoginActivity.REGISTERED_USER_ID, mUserId);
                 }
-                else {
-                    i.putExtra(LoginActivity.ANON_USER_ID,mUserId);
-                }
                 startActivity(i);
             }
         });
@@ -126,9 +123,6 @@ public class GroupListFragment extends Fragment {
                 i.putExtra(EditGroupActivity.GROUP_OBJECT_ID, group.getObjectId());
                 if (mIsRegistered) {
                     i.putExtra(LoginActivity.REGISTERED_USER_ID,mUserId);
-                }
-                else {
-                    i.putExtra(LoginActivity.ANON_USER_ID,mUserId);
                 }
                 startActivity(i);
                 return true;

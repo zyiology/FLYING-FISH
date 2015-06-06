@@ -92,9 +92,6 @@ public class FishActivity extends ActionBarActivity implements ActionBar.TabList
             if (getIntent().getExtras().containsKey(LoginActivity.REGISTERED_USER_ID)) {
                 mUserId = getIntent().getStringExtra(LoginActivity.REGISTERED_USER_ID);
                 mIsRegistered = true;
-            } else {
-                mUserId = getIntent().getStringExtra(LoginActivity.ANON_USER_ID);
-                mIsRegistered = false;
             }
         }
     }

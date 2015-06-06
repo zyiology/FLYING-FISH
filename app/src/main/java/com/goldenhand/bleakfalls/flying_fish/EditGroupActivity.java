@@ -52,9 +52,6 @@ public class EditGroupActivity extends ActionBarActivity {
                                     if (getIntent().getExtras().containsKey(LoginActivity.REGISTERED_USER_ID)) {
                                         i.putExtra(LoginActivity.REGISTERED_USER_ID, getIntent().getStringExtra(LoginActivity.REGISTERED_USER_ID));
                                     }
-                                    else {
-                                        i.putExtra(LoginActivity.ANON_USER_ID, getIntent().getStringExtra(LoginActivity.ANON_USER_ID));
-                                    }
                                     startActivity(i);
                                 }
                             });

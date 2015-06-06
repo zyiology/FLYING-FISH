@@ -13,25 +13,33 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.SaveCallback;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 
 public class ChatActivity extends ActionBarActivity {
 
     private String userId;
+    private String friendId;
+    private String convoId;
     private Handler handler;
 
     private EditText messageET;
     private Button sendButton;
 
     private ListView chatLV;
-    private ArrayList<Message> messageArrayList;
+    private ArrayList<ParseObject> messageArrayList;
+    private List<ParseObject> chatMessageArray;
     private ChatListAdapter chatListAdapter;
 
     public static final String BODY = "body";
@@ -43,7 +51,9 @@ public class ChatActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        userId = getIntent().getStringExtra(LoginActivity.ANON_USER_ID);
+        userId = getIntent().getStringExtra(LoginActivity.REGISTERED_USER_ID);
+        friendId = getIntent().getStringExtra(FriendListFragment.SELECTED_USER_ID);
+        convoId = getIntent().getStringExtra(FriendListFragment.CONVO_ID);
 
 
         messageET = (EditText) findViewById(R.id.messageET);
@@ -70,13 +80,30 @@ public class ChatActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 String body = messageET.getText().toString();
-                Message message = new Message();
-                message.setUserId(userId);
-                message.setBody(body);
-                message.saveInBackground(new SaveCallback() {
+                final ParseObject newChatMessage = new ParseObject("ChatMessage");
+                newChatMessage.put("sender",userId);
+                newChatMessage.put("message",body);
+                newChatMessage.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
-                        receiveMessage();
+
+                        ParseQuery<ParseObject> convoQuery = ParseQuery.getQuery("Conversation");
+                        convoQuery.getInBackground(convoId, new GetCallback<ParseObject>() {
+                            @Override
+                            public void done(ParseObject parseObject, ParseException e) {
+                                List<ParseObject> chatMessageArray = parseObject.getList("chatMessageArray");
+                                chatMessageArray.add(newChatMessage);
+                                parseObject.put("chatMessageArray", chatMessageArray);
+                                parseObject.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        receiveMessage();
+                                    }
+                                });
+                            }
+                        });
+
+
                     }
                 });
                 messageET.setText("");
@@ -89,22 +116,38 @@ public class ChatActivity extends ActionBarActivity {
     // Query messages from Parse so we can load them into the chat adapter
     private void receiveMessage() {
         // Construct query to execute
-        ParseQuery<Message> query = ParseQuery.getQuery(Message.class);
-        // Configure limit and sort order
-        query.setLimit(MAX_MESSAGES);
-        query.orderByAscending("createdAt");
-        // Execute query to fetch all messages from Parse asynchronously
-        // This is equivalent to a SELECT query with SQL
-        query.findInBackground(new FindCallback<Message>() {
-            public void done(List<Message> messages, ParseException e) {
+        ParseQuery<ParseObject> refreshQuery = ParseQuery.getQuery("Conversation");
+
+        System.out.println("CONVO ID: "+convoId);
+
+        refreshQuery.getInBackground(convoId, new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
                 if (e == null) {
+                    chatMessageArray = parseObject.getList("chatMessageArray");
+                    System.out.println(chatMessageArray);
+
+                    /*
+                    Collections.sort(chatMessageArray, new Comparator<ParseObject>() {
+                        @Override
+                        public int compare(ParseObject lhs, ParseObject rhs) {
+                            try{
+                                return lhs.fetchIfNeeded().getDate("createdAt").compareTo(rhs.fetchIfNeeded().getDate("createdAt"));
+                            } catch (ParseException e1) {
+                                e1.printStackTrace();
+                                return 0;
+                            }
+                        }
+                    });
+                    */
+
                     messageArrayList.clear();
-                    messageArrayList.addAll(messages);
-                    chatListAdapter.notifyDataSetChanged(); // update adapter
-                    chatLV.invalidate(); // redraw listview
-                } else {
-                    Log.d("message", "Error: " + e.getMessage());
+                    messageArrayList.addAll(chatMessageArray);
+                    chatListAdapter.notifyDataSetChanged();
+                    chatLV.invalidate();
                 }
+
+
             }
         });
     }

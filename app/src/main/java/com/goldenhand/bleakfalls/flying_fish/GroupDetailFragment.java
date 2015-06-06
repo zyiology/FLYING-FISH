@@ -90,9 +90,6 @@ public class GroupDetailFragment extends Fragment {
                                     if (mIsRegistered) {
                                         i.putExtra(LoginActivity.REGISTERED_USER_ID, mUserId);
                                     }
-                                    else {
-                                        i.putExtra(LoginActivity.ANON_USER_ID, mUserId);
-                                    }
                                     startActivity(i);
                                 }
                             });

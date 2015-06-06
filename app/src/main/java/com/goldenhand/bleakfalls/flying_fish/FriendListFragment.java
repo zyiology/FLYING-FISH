@@ -21,9 +21,13 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.w3c.dom.Text;
 
+import java.lang.reflect.Array;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -35,9 +39,15 @@ public class FriendListFragment extends Fragment {
     static List<ParseUser> mFriendList;
 
     private static String mUserId;
+    private static String mSelectedUserId;
+    private static String mConvoId;
     private static Boolean mIsRegistered;
+    private List<String> convoUsersArray;
     private ListView friendsLV;
     private FriendAdapter mFriendAdapter;
+
+    public static final String SELECTED_USER_ID = "selected user id";
+    public static final String CONVO_ID = "convo id";
 
     public FriendListFragment newInstance(int sectionNumber, String userId, boolean isRegistered) {
         FriendListFragment fragment = new FriendListFragment();
@@ -72,6 +82,7 @@ public class FriendListFragment extends Fragment {
                 mFriendAdapter = new FriendAdapter(getActivity(), R.layout.fragment_friend_list_item, mFriendList);
                 friendsLV = (ListView) rootView.findViewById(R.id.friends_list);
                 friendsLV.setAdapter(mFriendAdapter);
+                setUpFriendsOnClick();
             }
         });
 
@@ -81,21 +92,78 @@ public class FriendListFragment extends Fragment {
             public void onClick(View v) {
                 Intent addFriendIntent = new Intent(getActivity(), AddFriendListActivity.class);
                 addFriendIntent.putExtra(AddFriendListActivity.USER_ID, mUserId);
-                System.out.println("USER ID FOR ADDFRIENDLIST: "+mUserId);
+                System.out.println("USER ID FOR ADDFRIENDLIST: " + mUserId);
                 startActivityForResult(addFriendIntent, ADD_FRIEND_REQUEST);
             }
         });
 
+
+        return rootView;
+    }
+
+    private void startChatIntent() {
+        Intent chatIntent = new Intent(getActivity(), ChatActivity.class);
+        chatIntent.putExtra(LoginActivity.REGISTERED_USER_ID, mUserId);
+        chatIntent.putExtra(SELECTED_USER_ID, mSelectedUserId);
+        chatIntent.putExtra(CONVO_ID, mConvoId);
+        startActivity(chatIntent);
+    }
+
+    private void setUpFriendsOnClick() {
         friendsLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ParseUser selectedUser = (ParseUser) friendsLV.getItemAtPosition(position);
+                mSelectedUserId = selectedUser.getObjectId();
 
+                convoUsersArray = new ArrayList<>();
+
+                convoUsersArray.add(mUserId);
+                convoUsersArray.add(mSelectedUserId);
+
+                Collections.sort(convoUsersArray, new Comparator<String>() {
+                    @Override
+                    public int compare(String lhs, String rhs) {
+                        return lhs.compareToIgnoreCase(rhs);
+                    }
+                });
+
+                ParseQuery<ParseObject> convoQuery = ParseQuery.getQuery("Conversation");
+                convoQuery.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(List<ParseObject> list, ParseException e) {
+                        if (e == null) {
+                            Boolean foundExistingConvo = false;
+                            for (ParseObject convo : list) {
+
+                                if (convo.getList("users").equals(convoUsersArray)) {
+                                    mConvoId = convo.getObjectId();
+                                    startChatIntent();
+                                    foundExistingConvo = true;
+                                }
+                            }
+
+                            if (!foundExistingConvo) {
+                                System.out.println("CREATING NEW CONVO");
+                                final ParseObject newConvo = new ParseObject("Conversation");
+                                newConvo.put("users", convoUsersArray);
+                                newConvo.put("chatMessageArray", new ArrayList<ParseObject>());
+                                newConvo.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e == null) {
+                                            mConvoId = newConvo.getObjectId();
+                                            startChatIntent();
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
 
             }
         });
-
-        return rootView;
     }
 
     public void updateAdapter() {
@@ -118,8 +186,6 @@ public class FriendListFragment extends Fragment {
             if (convertView == null) {
                 LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 convertView = mInflater.inflate(R.layout.fragment_friend_list_item, null);
-
-
             }
 
             holder.friendName = (TextView)convertView.findViewById(R.id.friend_name);
