@@ -55,7 +55,6 @@ public class ChatActivity extends ActionBarActivity {
         friendId = getIntent().getStringExtra(FriendListFragment.SELECTED_USER_ID);
         convoId = getIntent().getStringExtra(FriendListFragment.CONVO_ID);
 
-
         messageET = (EditText) findViewById(R.id.messageET);
         sendButton = (Button) findViewById(R.id.sendButton);
         chatLV = (ListView) findViewById(R.id.chatLV);
