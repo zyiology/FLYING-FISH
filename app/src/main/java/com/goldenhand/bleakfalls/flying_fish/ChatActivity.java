@@ -109,8 +109,6 @@ public class ChatActivity extends ActionBarActivity {
         });
     }
 
-    // Defines a runnable which is run every 100ms
-
 
 
     @Override

@@ -38,12 +38,14 @@ public class AddFriendListActivity extends ActionBarActivity {
         setContentView(R.layout.activity_add_friend_list);
 
         mUserId = getIntent().getStringExtra(USER_ID);
+        System.out.println("ADDFRIENDLIST USERID: "+mUserId);
 
         ParseQuery<ParseUser> selfQuery = ParseUser.getQuery();
         selfQuery.getInBackground(mUserId, new GetCallback<ParseUser>() {
             @Override
             public void done(ParseUser parseUser, ParseException e) {
                 mFriends = parseUser.getList("friends");
+                System.out.println("SELFQUERY: "+mFriends);
                 currentUser = parseUser;
             }
         });
@@ -54,6 +56,13 @@ public class AddFriendListActivity extends ActionBarActivity {
             public void done(List<ParseUser> list, ParseException e) {
                 if (e == null) {
                     mUserList = list;
+                    mUserList.remove(currentUser);
+                    if (mFriends != null) {
+                        for (ParseUser friend : mFriends) {
+                            mUserList.remove(friend);
+                        }
+                    }
+                    System.out.println("USERQUERY: "+mFriends);
                     UserAdapter mUserAdapter = new UserAdapter(AddFriendListActivity.this, R.layout.activity_add_friend_list_item, mUserList);
                     usernameLV = (ListView) findViewById(R.id.username_list);
                     usernameLV.setAdapter(mUserAdapter);
@@ -69,7 +78,7 @@ public class AddFriendListActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ParseUser selectedUser = (ParseUser) usernameLV.getItemAtPosition(position);
 
-                if (!mFriends.contains(selectedUser)) {
+                if (!mFriends.contains(selectedUser) && selectedUser != currentUser) {
 
                     mFriends.add(selectedUser);
                     currentUser.put("friends",mFriends);

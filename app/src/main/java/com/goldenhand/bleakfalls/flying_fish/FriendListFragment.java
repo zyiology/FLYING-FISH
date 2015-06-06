@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -35,6 +36,7 @@ public class FriendListFragment extends Fragment {
 
     private static String mUserId;
     private static Boolean mIsRegistered;
+    private ListView friendsLV;
     private FriendAdapter mFriendAdapter;
 
     public FriendListFragment newInstance(int sectionNumber, String userId, boolean isRegistered) {
@@ -68,7 +70,7 @@ public class FriendListFragment extends Fragment {
                 System.out.println("USER ID IN FLF: "+mUserId);
                 mFriendList = parseUser.getList("friends");
                 mFriendAdapter = new FriendAdapter(getActivity(), R.layout.fragment_friend_list_item, mFriendList);
-                ListView friendsLV = (ListView) rootView.findViewById(R.id.friends_list);
+                friendsLV = (ListView) rootView.findViewById(R.id.friends_list);
                 friendsLV.setAdapter(mFriendAdapter);
             }
         });
@@ -79,7 +81,17 @@ public class FriendListFragment extends Fragment {
             public void onClick(View v) {
                 Intent addFriendIntent = new Intent(getActivity(), AddFriendListActivity.class);
                 addFriendIntent.putExtra(AddFriendListActivity.USER_ID, mUserId);
+                System.out.println("USER ID FOR ADDFRIENDLIST: "+mUserId);
                 startActivityForResult(addFriendIntent, ADD_FRIEND_REQUEST);
+            }
+        });
+
+        friendsLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ParseUser selectedUser = (ParseUser) friendsLV.getItemAtPosition(position);
+
+
             }
         });
 
