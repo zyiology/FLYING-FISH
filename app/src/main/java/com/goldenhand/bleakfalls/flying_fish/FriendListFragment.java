@@ -1,7 +1,9 @@
 package com.goldenhand.bleakfalls.flying_fish;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -36,7 +38,7 @@ public class FriendListFragment extends Fragment {
     private final String ARG_SECTION_NUMBER = "friend list section number";
     public static final int ADD_FRIEND_REQUEST = 1;
 
-    static List<ParseUser> mFriendList;
+    private List<ParseUser> mFriendList;
 
     private static String mUserId;
     private static String mSelectedUserId;
@@ -45,6 +47,8 @@ public class FriendListFragment extends Fragment {
     private List<String> convoUsersArray;
     private ListView friendsLV;
     private FriendAdapter mFriendAdapter;
+
+    private AlertDialog alertDialog;
 
     public static final String SELECTED_USER_ID = "selected user id";
     public static final String CONVO_ID = "convo id";
@@ -77,7 +81,6 @@ public class FriendListFragment extends Fragment {
         friendQuery.getInBackground(mUserId, new GetCallback<ParseUser>() {
             @Override
             public void done(ParseUser parseUser, ParseException e) {
-                System.out.println("USER ID IN FLF: "+mUserId);
                 mFriendList = parseUser.getList("friends");
                 mFriendAdapter = new FriendAdapter(getActivity(), R.layout.fragment_friend_list_item, mFriendList);
                 friendsLV = (ListView) rootView.findViewById(R.id.friends_list);
@@ -92,7 +95,6 @@ public class FriendListFragment extends Fragment {
             public void onClick(View v) {
                 Intent addFriendIntent = new Intent(getActivity(), AddFriendListActivity.class);
                 addFriendIntent.putExtra(AddFriendListActivity.USER_ID, mUserId);
-                System.out.println("USER ID FOR ADDFRIENDLIST: " + mUserId);
                 startActivityForResult(addFriendIntent, ADD_FRIEND_REQUEST);
             }
         });
@@ -113,61 +115,112 @@ public class FriendListFragment extends Fragment {
         friendsLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ParseUser selectedUser = (ParseUser) friendsLV.getItemAtPosition(position);
-                mSelectedUserId = selectedUser.getObjectId();
+                if (alertDialog == null || !alertDialog.isShowing()) {
 
-                convoUsersArray = new ArrayList<>();
+                    ParseUser selectedUser = (ParseUser) friendsLV.getItemAtPosition(position);
+                    mSelectedUserId = selectedUser.getObjectId();
 
-                convoUsersArray.add(mUserId);
-                convoUsersArray.add(mSelectedUserId);
+                    convoUsersArray = new ArrayList<>();
 
-                Collections.sort(convoUsersArray, new Comparator<String>() {
-                    @Override
-                    public int compare(String lhs, String rhs) {
-                        return lhs.compareToIgnoreCase(rhs);
-                    }
-                });
+                    convoUsersArray.add(mUserId);
+                    convoUsersArray.add(mSelectedUserId);
 
-                ParseQuery<ParseObject> convoQuery = ParseQuery.getQuery("Conversation");
-                convoQuery.findInBackground(new FindCallback<ParseObject>() {
-                    @Override
-                    public void done(List<ParseObject> list, ParseException e) {
-                        if (e == null) {
-                            Boolean foundExistingConvo = false;
-                            for (ParseObject convo : list) {
+                    Collections.sort(convoUsersArray, new Comparator<String>() {
+                        @Override
+                        public int compare(String lhs, String rhs) {
+                            return lhs.compareToIgnoreCase(rhs);
+                        }
+                    });
 
-                                if (convo.getList("users").equals(convoUsersArray)) {
-                                    mConvoId = convo.getObjectId();
-                                    startChatIntent();
-                                    foundExistingConvo = true;
+                    ParseQuery<ParseObject> convoQuery = ParseQuery.getQuery("Conversation");
+                    convoQuery.findInBackground(new FindCallback<ParseObject>() {
+                        @Override
+                        public void done(List<ParseObject> list, ParseException e) {
+                            if (e == null) {
+                                Boolean foundExistingConvo = false;
+                                for (ParseObject convo : list) {
+
+                                    if (convo.getList("users").equals(convoUsersArray)) {
+                                        mConvoId = convo.getObjectId();
+                                        startChatIntent();
+                                        foundExistingConvo = true;
+                                    }
+                                }
+
+                                if (!foundExistingConvo) {
+                                    final ParseObject newConvo = new ParseObject("Conversation");
+                                    newConvo.put("users", convoUsersArray);
+                                    newConvo.put("chatMessageArray", new ArrayList<ParseObject>());
+                                    newConvo.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            if (e == null) {
+                                                mConvoId = newConvo.getObjectId();
+                                                startChatIntent();
+                                            }
+                                        }
+                                    });
                                 }
                             }
-
-                            if (!foundExistingConvo) {
-                                System.out.println("CREATING NEW CONVO");
-                                final ParseObject newConvo = new ParseObject("Conversation");
-                                newConvo.put("users", convoUsersArray);
-                                newConvo.put("chatMessageArray", new ArrayList<ParseObject>());
-                                newConvo.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        if (e == null) {
-                                            mConvoId = newConvo.getObjectId();
-                                            startChatIntent();
-                                        }
-                                    }
-                                });
-                            }
                         }
-                    }
-                });
+                    });
+                }
 
+            }
+        });
+
+        friendsLV.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                final ParseUser selectedUser = (ParseUser) friendsLV.getItemAtPosition(position);
+
+                alertDialog = confirmFriendDeleteDialog(selectedUser);
+                alertDialog.show();
+                return false;
             }
         });
     }
 
     public void updateAdapter() {
         mFriendAdapter.notifyDataSetChanged();
+    }
+
+    private AlertDialog confirmFriendDeleteDialog(final ParseUser friend) {
+        return new AlertDialog.Builder(getActivity())
+                .setTitle(getText(R.string.delete_warning))
+                .setMessage(getText(R.string.delete_friend)+" "+friend.getUsername()+"?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        ParseQuery<ParseUser> deleteQuery = ParseUser.getQuery();
+                        deleteQuery.getInBackground(mUserId, new GetCallback<ParseUser>() {
+                            @Override
+                            public void done(final ParseUser parseUser, ParseException e) {
+                                if (e == null) {
+                                    List<ParseUser> mFriends = parseUser.getList("friends");
+                                    mFriends.remove(friend);
+                                    parseUser.put("friends", mFriends);
+                                    parseUser.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            mFriendList.remove(friend);
+                                            updateAdapter();
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .create();
     }
 
     private class FriendAdapter extends ArrayAdapter<ParseUser> {

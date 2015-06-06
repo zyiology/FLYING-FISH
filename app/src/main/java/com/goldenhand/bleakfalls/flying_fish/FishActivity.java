@@ -209,7 +209,7 @@ public class FishActivity extends ActionBarActivity implements ActionBar.TabList
     public void LogOut() {
         Intent i = new Intent(this,LoginActivity.class);
         startActivity(i);
-
+        finish();
     }
 
     /**

@@ -34,6 +34,8 @@
 
     <!--FriendListFragment-->
     <string name="add_friend">Add Friend</string>
+    <string name="delete_warning">Warning!</string>
+    <string name="delete_friend">Delete friend</string>
 
     <!--AddFriendList-->
     <string name="choose_friend">Choose a friend</string>

@@ -38,14 +38,12 @@ public class AddFriendListActivity extends ActionBarActivity {
         setContentView(R.layout.activity_add_friend_list);
 
         mUserId = getIntent().getStringExtra(USER_ID);
-        System.out.println("ADDFRIENDLIST USERID: " + mUserId);
 
         ParseQuery<ParseUser> selfQuery = ParseUser.getQuery();
         selfQuery.getInBackground(mUserId, new GetCallback<ParseUser>() {
             @Override
             public void done(ParseUser parseUser, ParseException e) {
                 mFriends = (List<ParseUser>) parseUser.get("friends");
-                System.out.println("SELFQUERY: " + mFriends);
                 currentUser = parseUser;
 
                 ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
@@ -60,7 +58,6 @@ public class AddFriendListActivity extends ActionBarActivity {
                                     mUserList.remove(friend);
                                 }
                             }
-                            System.out.println("USERQUERY: " + mFriends);
                             UserAdapter mUserAdapter = new UserAdapter(AddFriendListActivity.this, R.layout.activity_add_friend_list_item, mUserList);
                             usernameLV = (ListView) findViewById(R.id.username_list);
                             usernameLV.setAdapter(mUserAdapter);
@@ -89,7 +86,6 @@ public class AddFriendListActivity extends ActionBarActivity {
                             Intent navigateUpIntent = new Intent();
                             navigateUpIntent.putExtra(LoginActivity.REGISTERED_USER_ID, currentUser.getObjectId());
                             setResult(RESULT_OK, navigateUpIntent);
-                            System.out.println("NAVIGATING BACK");
                             finish();
                         }
                     });

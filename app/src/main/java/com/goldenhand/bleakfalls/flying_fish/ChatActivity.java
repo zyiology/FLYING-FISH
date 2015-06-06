@@ -117,14 +117,11 @@ public class ChatActivity extends ActionBarActivity {
         // Construct query to execute
         ParseQuery<ParseObject> refreshQuery = ParseQuery.getQuery("Conversation");
 
-        System.out.println("CONVO ID: "+convoId);
-
         refreshQuery.getInBackground(convoId, new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject parseObject, ParseException e) {
                 if (e == null) {
                     chatMessageArray = parseObject.getList("chatMessageArray");
-                    System.out.println(chatMessageArray);
 
                     /*
                     Collections.sort(chatMessageArray, new Comparator<ParseObject>() {
