@@ -35,6 +35,7 @@ public class FriendListFragment extends Fragment {
 
     private static String mUserId;
     private static Boolean mIsRegistered;
+    private FriendAdapter mFriendAdapter;
 
     public FriendListFragment newInstance(int sectionNumber, String userId, boolean isRegistered) {
         FriendListFragment fragment = new FriendListFragment();
@@ -66,7 +67,7 @@ public class FriendListFragment extends Fragment {
             public void done(ParseUser parseUser, ParseException e) {
                 System.out.println("USER ID IN FLF: "+mUserId);
                 mFriendList = parseUser.getList("friends");
-                FriendAdapter mFriendAdapter = new FriendAdapter(getActivity(), R.layout.fragment_friend_list_item, mFriendList);
+                mFriendAdapter = new FriendAdapter(getActivity(), R.layout.fragment_friend_list_item, mFriendList);
                 ListView friendsLV = (ListView) rootView.findViewById(R.id.friends_list);
                 friendsLV.setAdapter(mFriendAdapter);
             }
@@ -83,6 +84,10 @@ public class FriendListFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    public void updateAdapter() {
+        mFriendAdapter.notifyDataSetChanged();
     }
 
     private class FriendAdapter extends ArrayAdapter<ParseUser> {

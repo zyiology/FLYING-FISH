@@ -11,11 +11,13 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 
 /*
 TO MAKE THE FRIENDS FRAGMENT
@@ -86,12 +88,14 @@ public class FishActivity extends ActionBarActivity implements ActionBar.TabList
                             .setTabListener(this));
         }
 
-        if (getIntent().getExtras().containsKey(LoginActivity.REGISTERED_USER_ID)) {
-            mUserId = getIntent().getStringExtra(LoginActivity.REGISTERED_USER_ID);
-            mIsRegistered = true;
-        } else {
-            mUserId = getIntent().getStringExtra(LoginActivity.ANON_USER_ID);
-            mIsRegistered = false;
+        if (getIntent().getExtras() != null) {
+            if (getIntent().getExtras().containsKey(LoginActivity.REGISTERED_USER_ID)) {
+                mUserId = getIntent().getStringExtra(LoginActivity.REGISTERED_USER_ID);
+                mIsRegistered = true;
+            } else {
+                mUserId = getIntent().getStringExtra(LoginActivity.ANON_USER_ID);
+                mIsRegistered = false;
+            }
         }
     }
 
@@ -99,7 +103,10 @@ public class FishActivity extends ActionBarActivity implements ActionBar.TabList
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == FriendListFragment.ADD_FRIEND_REQUEST) {
             if (resultCode == RESULT_OK) {
-
+                FriendListFragment flf = (FriendListFragment) getSupportFragmentManager().findFragmentById(R.id.friends_list);
+                flf.updateAdapter();
+                mUserId = data.getStringExtra(LoginActivity.REGISTERED_USER_ID);
+                mIsRegistered = true;
             }
         }
     }
