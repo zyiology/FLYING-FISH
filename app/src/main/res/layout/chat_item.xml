@@ -7,13 +7,13 @@
         android:id="@+id/tvProfileLeft"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="8dp"
+        android:paddingLeft="5dp"
         android:textSize="15sp" />
     <ImageView
         android:id="@+id/ivProfileLeft"
         android:contentDescription="@string/profile_other"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_below="@+id/tvProfileLeft"
         android:src="@drawable/ic_launcher" />
 
@@ -33,7 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:paddingRight="8dp"
+        android:paddingRight="10dp"
         android:textSize="15sp"/>
     <ImageView
         android:id="@+id/ivProfileRight"

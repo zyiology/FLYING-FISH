@@ -25,7 +25,7 @@ public class ChatListAdapter extends ArrayAdapter<ParseObject> {
     private String mUserId;
     private String mUsername;
     private List<ParseObject> chatMessages;
-    private Boolean isMe;
+    private Boolean isMe = false;
 
     public ChatListAdapter(Context context, String userId, List<ParseObject> chatMessages) {
         super(context, 0, chatMessages);
@@ -50,18 +50,14 @@ public class ChatListAdapter extends ArrayAdapter<ParseObject> {
         final ParseObject chatMessage = chatMessages.get(position);
         final ViewHolder holder = (ViewHolder)convertView.getTag();
         try {
+            mUsername = chatMessage.fetchIfNeeded().getString("username");
             isMe = chatMessage.fetchIfNeeded().getString("sender").equals(mUserId);
+            holder.body.setText(chatMessage.fetchIfNeeded().getString("message"));
         } catch (com.parse.ParseException e) {
             e.printStackTrace();
         }
 
-        ParseQuery<ParseUser> nameQuery = ParseUser.getQuery();
-        nameQuery.getInBackground(mUserId, new GetCallback<ParseUser>() {
-            @Override
-            public void done(ParseUser parseUser, com.parse.ParseException e) {
-                mUsername = parseUser.getUsername();
-            }
-        });
+
 
         // Show-hide image based on the logged-in user.
         // Display the profile image to the right for our user, left for other users.
@@ -70,15 +66,25 @@ public class ChatListAdapter extends ArrayAdapter<ParseObject> {
             holder.imageLeft.setVisibility(View.GONE);
             holder.body.setGravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT);
             holder.nameRight.setText(mUsername);
+            holder.nameLeft.setText("");
         } else {
             holder.imageLeft.setVisibility(View.VISIBLE);
             holder.imageRight.setVisibility(View.GONE);
             holder.body.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
             holder.nameLeft.setText(mUsername);
+            holder.nameRight.setText("");
         }
+
+
         final ImageView profileView = isMe ? holder.imageRight : holder.imageLeft;
-        Picasso.with(getContext()).load(getProfileUrl(chatMessage.getString("sender"))).into(profileView);
-        holder.body.setText(chatMessage.getString("message"));
+        try {
+            Picasso.with(getContext()).load(getProfileUrl(chatMessage.fetchIfNeeded().getString("sender"))).into(profileView);
+        } catch (com.parse.ParseException e) {
+            e.printStackTrace();
+        }
+
+
+
         return convertView;
     }
 

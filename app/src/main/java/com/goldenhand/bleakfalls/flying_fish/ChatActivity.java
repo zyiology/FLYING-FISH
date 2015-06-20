@@ -17,6 +17,7 @@ import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.lang.reflect.Array;
@@ -59,9 +60,18 @@ public class ChatActivity extends ActionBarActivity {
         chatListAdapter = new ChatListAdapter(ChatActivity.this, userId, messageArrayList);
         chatLV.setAdapter(chatListAdapter);
 
+        handler = new Handler();
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                receiveMessage();
+                handler.postDelayed(this, 1000);
+            }
+        };
+
 
         handler.postDelayed(runnable, 1000);
-
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,30 +80,41 @@ public class ChatActivity extends ActionBarActivity {
 
                 final ParseObject newChatMessage = new ParseObject("ChatMessage");
                 newChatMessage.put("sender",userId);
-                newChatMessage.put("message",body);
-                newChatMessage.saveInBackground(new SaveCallback() {
+                newChatMessage.put("message", body);
+
+                ParseQuery<ParseUser> selfQuery = ParseUser.getQuery();
+                selfQuery.getInBackground(userId, new GetCallback<ParseUser>() {
                     @Override
-                    public void done(ParseException e) {
+                    public void done(ParseUser parseUser, ParseException e) {
+                        if (e == null) {
+                            newChatMessage.put("username", parseUser.getUsername());
+                            newChatMessage.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
 
-                        ParseQuery<ParseObject> convoQuery = ParseQuery.getQuery("Conversation");
-                        convoQuery.getInBackground(convoId, new GetCallback<ParseObject>() {
-                            @Override
-                            public void done(ParseObject parseObject, ParseException e) {
-                                List<ParseObject> chatMessageArray = parseObject.getList("chatMessageArray");
-                                chatMessageArray.add(newChatMessage);
-                                parseObject.put("chatMessageArray", chatMessageArray);
-                                parseObject.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        receiveMessage();
-                                    }
-                                });
-                            }
-                        });
+                                    ParseQuery<ParseObject> convoQuery = ParseQuery.getQuery("Conversation");
+                                    convoQuery.getInBackground(convoId, new GetCallback<ParseObject>() {
+                                        @Override
+                                        public void done(ParseObject parseObject, ParseException e) {
+                                            List<ParseObject> chatMessageArray = parseObject.getList("chatMessageArray");
+                                            chatMessageArray.add(newChatMessage);
+                                            parseObject.put("chatMessageArray", chatMessageArray);
+                                            parseObject.saveInBackground(new SaveCallback() {
+                                                @Override
+                                                public void done(ParseException e) {
+                                                    receiveMessage();
+                                                }
+                                            });
+                                        }
+                                    });
 
 
+                                }
+                            });
+                        }
                     }
                 });
+
                 messageET.setText("");
             }
         });
@@ -101,13 +122,7 @@ public class ChatActivity extends ActionBarActivity {
 
     }
 
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            receiveMessage();
-            handler.postDelayed(this, 1000);
-        }
-    };
+
 
     // Query messages from Parse so we can load them into the chat adapter
     private void receiveMessage() {

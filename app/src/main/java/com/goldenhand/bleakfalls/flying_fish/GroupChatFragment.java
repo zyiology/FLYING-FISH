@@ -16,6 +16,7 @@ import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
@@ -28,12 +29,13 @@ public class GroupChatFragment extends Fragment {
     private static boolean mIsRegistered;
     private static String mGroupId;
 
+    private Handler handler;
+
     private ListView chatLV;
     private ArrayList<ParseObject> messageArrayList;
     private ChatListAdapter chatListAdapter;
     private List<ParseObject> chatMessageArray;
 
-    final Handler handler = new Handler();
 
     public GroupChatFragment newInstance(int sectionNumber, String userId, Boolean isRegistered, String groupId) {
         GroupChatFragment fragment = new GroupChatFragment();
@@ -70,38 +72,60 @@ public class GroupChatFragment extends Fragment {
         chatListAdapter = new ChatListAdapter(getActivity(), mUserId, messageArrayList);
         chatLV.setAdapter(chatListAdapter);
 
+        handler = new Handler();
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                receiveMessage();
+                handler.postDelayed(this, 1000);
+            }
+        };
+
+
+
         handler.postDelayed(runnable, 1000);
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String body = messageET.getText().toString();
+
                 final ParseObject newChatMessage = new ParseObject("ChatMessage");
                 newChatMessage.put("sender",mUserId);
-                newChatMessage.put("message",body);
-                newChatMessage.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
+                newChatMessage.put("message", body);
 
-                        ParseQuery<ParseObject> groupQuery = ParseQuery.getQuery("Group");
-                        groupQuery.getInBackground(mGroupId, new GetCallback<ParseObject>() {
+                ParseQuery<ParseUser> selfQuery = ParseUser.getQuery();
+                selfQuery.getInBackground(mUserId, new GetCallback<ParseUser>() {
+                    @Override
+                    public void done(ParseUser parseUser, ParseException e) {
+                        newChatMessage.put("username", parseUser.getUsername());
+                        newChatMessage.saveInBackground(new SaveCallback() {
                             @Override
-                            public void done(ParseObject parseObject, ParseException e) {
-                                List<ParseObject> chatMessageArray = parseObject.getList("groupMessageArray");
-                                chatMessageArray.add(newChatMessage);
-                                parseObject.put("groupMessageArray", chatMessageArray);
-                                parseObject.saveInBackground(new SaveCallback() {
+                            public void done(ParseException e) {
+
+                                ParseQuery<ParseObject> groupQuery = ParseQuery.getQuery("Group");
+                                groupQuery.getInBackground(mGroupId, new GetCallback<ParseObject>() {
                                     @Override
-                                    public void done(ParseException e) {
-                                        receiveMessage();
+                                    public void done(ParseObject parseObject, ParseException e) {
+                                        List<ParseObject> chatMessageArray = parseObject.getList("groupMessageArray");
+                                        chatMessageArray.add(newChatMessage);
+                                        parseObject.put("groupMessageArray", chatMessageArray);
+                                        parseObject.saveInBackground(new SaveCallback() {
+                                            @Override
+                                            public void done(ParseException e) {
+                                                receiveMessage();
+                                            }
+                                        });
                                     }
                                 });
+
+
                             }
                         });
-
-
                     }
                 });
+
                 messageET.setText("");
             }
         });
@@ -109,13 +133,6 @@ public class GroupChatFragment extends Fragment {
         return rootView;
     }
 
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            receiveMessage();
-            handler.postDelayed(this, 1000);
-        }
-    };
 
     private void receiveMessage() {
         // Construct query to execute
