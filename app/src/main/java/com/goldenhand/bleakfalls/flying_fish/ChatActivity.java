@@ -42,10 +42,6 @@ public class ChatActivity extends ActionBarActivity {
     private List<ParseObject> chatMessageArray;
     private ChatListAdapter chatListAdapter;
 
-    public static final String BODY = "body";
-
-    private static final Integer MAX_MESSAGES = 50;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,22 +59,15 @@ public class ChatActivity extends ActionBarActivity {
         chatListAdapter = new ChatListAdapter(ChatActivity.this, userId, messageArrayList);
         chatLV.setAdapter(chatListAdapter);
 
-        handler = new Handler();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                receiveMessage();
-                handler.postDelayed(this, 100);
-            }
-        };
 
-        handler.postDelayed(runnable, 100);
+        handler.postDelayed(runnable, 1000);
 
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String body = messageET.getText().toString();
+
                 final ParseObject newChatMessage = new ParseObject("ChatMessage");
                 newChatMessage.put("sender",userId);
                 newChatMessage.put("message",body);
@@ -111,6 +100,14 @@ public class ChatActivity extends ActionBarActivity {
 
 
     }
+
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            receiveMessage();
+            handler.postDelayed(this, 1000);
+        }
+    };
 
     // Query messages from Parse so we can load them into the chat adapter
     private void receiveMessage() {

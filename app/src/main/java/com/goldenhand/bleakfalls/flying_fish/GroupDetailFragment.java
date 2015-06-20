@@ -27,12 +27,6 @@ import com.parse.SaveCallback;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Default on 24/5/2015.
- */
-
-
-
 public class GroupDetailFragment extends Fragment {
     private final String ARG_SECTION_NUMBER = "section_number";
     static List<ParseObject> mGroupList;

@@ -104,6 +104,11 @@ public class GroupActivity extends ActionBarActivity {
                     GroupDetailFragment gf = new GroupDetailFragment();
                     gf.newInstance(position + 1, mUserId, mIsRegistered, mGroupId);
                     return gf;
+
+                case 1:
+                    GroupChatFragment gcf = new GroupChatFragment();
+                    gcf.newInstance(position + 1, mUserId, mIsRegistered, mGroupId);
+                    return gcf;
             }
             return PlaceholderFragment.newInstance(position + 1);
         }

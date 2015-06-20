@@ -19,6 +19,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.SaveCallback;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -80,6 +81,7 @@ public class GroupListFragment extends Fragment {
             public void onClick(View v) {
                 ParseObject newGroup = new ParseObject("Group");
                 newGroup.put("Name", "New Group");
+                newGroup.put("groupMessageArray", new ArrayList<>());
                 newGroup.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
@@ -91,6 +93,9 @@ public class GroupListFragment extends Fragment {
                                     GroupAdapter mGroupAdapter = new GroupAdapter(getActivity(), R.layout.fragment_fish_groups_item, mGroupList);
                                     System.out.println("DONNNNNNNNNNNNNNNNNNNNE");
                                     lv.setAdapter(mGroupAdapter);
+
+
+
                                 } else {
                                     System.out.println("FAILURE U IDIOT");
                                 }

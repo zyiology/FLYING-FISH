@@ -9,8 +9,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.parse.GetCallback;
 import com.parse.Parse;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 
 import java.math.BigInteger;
@@ -20,6 +23,7 @@ import java.util.List;
 
 public class ChatListAdapter extends ArrayAdapter<ParseObject> {
     private String mUserId;
+    private String mUsername;
     private List<ParseObject> chatMessages;
     private Boolean isMe;
 
@@ -36,7 +40,9 @@ public class ChatListAdapter extends ArrayAdapter<ParseObject> {
                     inflate(R.layout.chat_item, parent, false);
             final ViewHolder holder = new ViewHolder();
             holder.imageLeft = (ImageView)convertView.findViewById(R.id.ivProfileLeft);
+            holder.nameLeft = (TextView) convertView.findViewById(R.id.tvProfileLeft);
             holder.imageRight = (ImageView)convertView.findViewById(R.id.ivProfileRight);
+            holder.nameRight = (TextView) convertView.findViewById(R.id.tvProfileRight);
             holder.body = (TextView)convertView.findViewById(R.id.tvBody);
             convertView.setTag(holder);
         }
@@ -48,16 +54,27 @@ public class ChatListAdapter extends ArrayAdapter<ParseObject> {
         } catch (com.parse.ParseException e) {
             e.printStackTrace();
         }
+
+        ParseQuery<ParseUser> nameQuery = ParseUser.getQuery();
+        nameQuery.getInBackground(mUserId, new GetCallback<ParseUser>() {
+            @Override
+            public void done(ParseUser parseUser, com.parse.ParseException e) {
+                mUsername = parseUser.getUsername();
+            }
+        });
+
         // Show-hide image based on the logged-in user.
         // Display the profile image to the right for our user, left for other users.
         if (isMe) {
             holder.imageRight.setVisibility(View.VISIBLE);
             holder.imageLeft.setVisibility(View.GONE);
             holder.body.setGravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT);
+            holder.nameRight.setText(mUsername);
         } else {
             holder.imageLeft.setVisibility(View.VISIBLE);
             holder.imageRight.setVisibility(View.GONE);
             holder.body.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
+            holder.nameLeft.setText(mUsername);
         }
         final ImageView profileView = isMe ? holder.imageRight : holder.imageLeft;
         Picasso.with(getContext()).load(getProfileUrl(chatMessage.getString("sender"))).into(profileView);
@@ -81,7 +98,9 @@ public class ChatListAdapter extends ArrayAdapter<ParseObject> {
 
     final class ViewHolder {
         private ImageView imageLeft;
+        private TextView nameLeft;
         private ImageView imageRight;
+        private TextView nameRight;
         private TextView body;
     }
 
