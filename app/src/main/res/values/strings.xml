@@ -43,4 +43,28 @@
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_add_friend_list">AddFriendListActivity</string>
+    <string name="title_activity_group_upload_fragment">GroupUploadFragment</string>
+
+    <string name="add_image">Add Image</string>
+
+    <string-array name="image_ids">
+        <item>@drawable/image_1</item>
+        <item>@drawable/image_1</item>
+        <item>@drawable/image_1</item>
+        <item>@drawable/image_1</item>
+        <item>@drawable/image_1</item>
+        <item>@drawable/image_1</item>
+        <item>@drawable/image_1</item>
+        <item>@drawable/image_1</item>
+        <item>@drawable/image_1</item>
+        <item>@drawable/image_1</item>
+        <item>@drawable/image_1</item>
+        <item>@drawable/image_1</item>
+        <item>@drawable/image_1</item>
+        <item>@drawable/image_1</item>
+        <item>@drawable/image_1</item>
+        <item>@drawable/image_1</item>
+        <item>@drawable/image_1</item>
+        <item>@drawable/image_1</item>
+    </string-array>
 </resources>
