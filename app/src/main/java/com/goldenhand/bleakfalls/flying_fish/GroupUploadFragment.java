@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +34,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -80,13 +82,17 @@ public class GroupUploadFragment extends Fragment {
         query.getInBackground(mGroupId, new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject parseObject, ParseException e) {
-                ArrayList<ImageItem> images = (ArrayList<ImageItem>) parseObject.get("Images");
-                if (images != null) {
+                ArrayList<String> mImageText = (ArrayList<String>) parseObject.get("Images");
+                ArrayList<Bitmap> images = new ArrayList<Bitmap>();
+                if (mImageText != null) {
+                    for (int i=0;i<mImageText.size();i++) {
+                        images.add(stringToBitmap(mImageText.get(i)));
+                    }
                     GridViewAdapter gridAdapter = new GridViewAdapter(getActivity(), R.layout.fragment_fish_group_upload_item, images);
                     gridView.setAdapter(gridAdapter);
                 } else {
-                    GridViewAdapter gridAdapter = new GridViewAdapter(getActivity(), R.layout.fragment_fish_group_upload_item, getData());
-                    gridView.setAdapter(gridAdapter);
+                    //GridViewAdapter gridAdapter = new GridViewAdapter(getActivity(), R.layout.fragment_fish_group_upload_item, getData());
+                    //gridView.setAdapter(gridAdapter);
 
                     /*Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     startActivityForResult(i, RESULT_LOAD_IMAGE);*/
@@ -114,18 +120,23 @@ public class GroupUploadFragment extends Fragment {
             if (requestCode == SELECT_PICTURE) {
                 Uri selectedImageUri = data.getData();
                 try {
-                    final Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImageUri);
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImageUri);
+                    final String newImage = bitmapToString(bitmap);
                     ParseQuery query = ParseQuery.getQuery("Group");
                     query.getInBackground(mGroupId, new GetCallback<ParseObject>() {
                         @Override
                         public void done(ParseObject parseObject, ParseException e) {
-                            ArrayList<ImageItem> images = (ArrayList<ImageItem>) parseObject.get("Images");
-                            images.add(new ImageItem(bitmap, "IMAGE X"));
+                            ArrayList<String> images = (ArrayList<String>) parseObject.get("Images");
+                            if (images==null) {
+                                images = new ArrayList<String>();
+                            }
+                            images.add(newImage);
                             parseObject.put("Images", images);
                             parseObject.saveInBackground(new SaveCallback() {
                                 @Override
                                 public void done(ParseException e) {
                                     Toast.makeText(getActivity(),"SAVED",Toast.LENGTH_SHORT).show();
+                                    
                                 }
                             });
                         }
@@ -141,16 +152,26 @@ public class GroupUploadFragment extends Fragment {
         }
     }
 
-    private ArrayList<ImageItem> getData() {
+    public final static String bitmapToString(Bitmap in){
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        in.compress(Bitmap.CompressFormat.PNG, 100, bytes);
+        return Base64.encodeToString(bytes.toByteArray(), Base64.DEFAULT);
+    }
+    public final static Bitmap stringToBitmap(String in){
+        byte[] bytes = Base64.decode(in, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+    }
+
+    /*private ArrayList<ImageItem> getData() {
         final ArrayList<ImageItem> imageItems = new ArrayList<>();
         TypedArray imgs = getResources().obtainTypedArray(R.array.image_ids);
         for (int i = 0; i < imgs.length(); i++) {
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), imgs.getResourceId(i, -1));
-            imageItems.add(new ImageItem(bitmap, "Image#" + i));
+            imageItems.add(bitmap);
         }
         imgs.recycle();
         return imageItems;
-    }
+    }*/
 
     public class GridViewAdapter extends ArrayAdapter {
         private Context context;
@@ -173,49 +194,20 @@ public class GroupUploadFragment extends Fragment {
                 LayoutInflater inflater = ((Activity) context).getLayoutInflater();
                 row = inflater.inflate(layoutResourceId, parent, false);
                 holder = new ViewHolder();
-                holder.imageTitle = (TextView) row.findViewById(R.id.text);
                 holder.image = (ImageView) row.findViewById(R.id.image);
                 row.setTag(holder);
             } else {
                 holder = (ViewHolder) row.getTag();
             }
 
-            ImageItem item = (ImageItem) data.get(position);
-            holder.imageTitle.setText(item.getTitle());
-            holder.image.setImageBitmap(item.getImage());
+            Bitmap item = (Bitmap) data.get(position);
+            holder.image.setImageBitmap(item);
             return row;
         }
 
         class ViewHolder {
             TextView imageTitle;
             ImageView image;
-        }
-    }
-
-    public class ImageItem {
-        private Bitmap image;
-        private String title;
-
-        public ImageItem(Bitmap image, String title) {
-            super();
-            this.image = image;
-            this.title = title;
-        }
-
-        public Bitmap getImage() {
-            return image;
-        }
-
-        public void setImage(Bitmap image) {
-            this.image = image;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public void setTitle(String title) {
-            this.title = title;
         }
     }
 }
