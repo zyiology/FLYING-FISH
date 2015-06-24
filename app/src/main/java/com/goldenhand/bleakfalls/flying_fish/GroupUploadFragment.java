@@ -1,6 +1,7 @@
 package com.goldenhand.bleakfalls.flying_fish;
 
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
@@ -40,7 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GroupUploadFragment extends Fragment {
-    private final String ARG_SECTION_NUMBER = "section_number";
+    private final static String ARG_SECTION_NUMBER = "section_number";
 
     private static final int SELECT_PICTURE = 1;
     private String selectedImagePath;
@@ -50,15 +51,17 @@ public class GroupUploadFragment extends Fragment {
     private static String mUserId;
     private static boolean mIsRegistered;
     private static String mGroupId;
+    private static int mPosition;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
-    public GroupUploadFragment newInstance(int sectionNumber, String userId, boolean isRegistered, String groupId) {
+    public static GroupUploadFragment newInstance(int sectionNumber, String userId, boolean isRegistered, String groupId) {
         GroupUploadFragment fragment = new GroupUploadFragment();
         Bundle args = new Bundle();
+        mPosition = sectionNumber;
         mUserId = userId;
         mIsRegistered = isRegistered;
         mGroupId = groupId;
@@ -135,8 +138,12 @@ public class GroupUploadFragment extends Fragment {
                             parseObject.saveInBackground(new SaveCallback() {
                                 @Override
                                 public void done(ParseException e) {
-                                    Toast.makeText(getActivity(),"SAVED",Toast.LENGTH_SHORT).show();
-                                    
+                                        Intent i = new Intent(getActivity(), GroupActivity.class);
+                                        if (mIsRegistered) {
+                                            i.putExtra(LoginActivity.REGISTERED_USER_ID,mUserId);
+                                        }
+                                        i.putExtra(GroupActivity.GROUP_ID,mGroupId);
+                                        startActivity(i);
                                 }
                             });
                         }
