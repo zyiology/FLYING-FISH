@@ -46,6 +46,10 @@
             android:name=".AddFriendListActivity"
             android:label="@string/title_activity_add_friend_list" >
         </activity>
+        <activity
+            android:name=".PreGroupActivity"
+            android:label="@string/title_activity_pre_group" >
+        </activity>
     </application>
 
 </manifest>

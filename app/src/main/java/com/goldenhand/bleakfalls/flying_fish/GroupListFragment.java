@@ -93,9 +93,6 @@ public class GroupListFragment extends Fragment {
                                     GroupAdapter mGroupAdapter = new GroupAdapter(getActivity(), R.layout.fragment_fish_groups_item, mGroupList);
                                     System.out.println("DONNNNNNNNNNNNNNNNNNNNE");
                                     lv.setAdapter(mGroupAdapter);
-
-
-
                                 } else {
                                     System.out.println("FAILURE U IDIOT");
                                 }
@@ -110,7 +107,7 @@ public class GroupListFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ParseObject group = (ParseObject) lv.getItemAtPosition(position);
-                Intent i = new Intent(getActivity(), GroupActivity.class);
+                Intent i = new Intent(getActivity(), PreGroupActivity.class);
                 i.putExtra(GroupActivity.GROUP_ID,group.getObjectId());
                 if (mIsRegistered) {
                     i.putExtra(LoginActivity.REGISTERED_USER_ID, mUserId);

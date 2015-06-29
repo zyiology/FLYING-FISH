@@ -67,4 +67,5 @@
         <item>@drawable/image_1</item>
         <item>@drawable/image_1</item>
     </string-array>
+    <string name="title_activity_pre_group">PreGroupActivity</string>
 </resources>

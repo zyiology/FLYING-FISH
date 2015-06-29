@@ -61,40 +61,6 @@ public class GroupDetailFragment extends Fragment {
 
         final ListView lv = (ListView) rootView.findViewById(R.id.user_list);
 
-        Button mJoinGroupButton = (Button) rootView.findViewById(R.id.join_group);
-        mJoinGroupButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ParseQuery<ParseObject> query = ParseQuery.getQuery("Group");
-                query.getInBackground(mGroupId, new GetCallback<ParseObject>() {
-                    @Override
-                    public void done(ParseObject parseObject, ParseException e) {
-                        if (e == null) {
-                            ArrayList<String> mUserIdArrayList = (ArrayList<String>) parseObject.get("UserIds");
-                            if (mUserIdArrayList == null) {
-                                mUserIdArrayList = new ArrayList<String>();
-                            }
-                            mUserIdArrayList.add(mUserId);
-                            parseObject.put("UserIds", mUserIdArrayList);
-                            parseObject.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                    Toast.makeText(getActivity(), "ADDED!", Toast.LENGTH_SHORT).show();
-                                    Intent i = new Intent(getActivity(),FishActivity.class);
-                                    if (mIsRegistered) {
-                                        i.putExtra(LoginActivity.REGISTERED_USER_ID, mUserId);
-                                    }
-                                    startActivity(i);
-                                }
-                            });
-                        } else {
-                            //TODO ANYTHING??
-                        }
-                    }
-                });
-            }
-        });
-
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Group");
         query.getInBackground(mGroupId, new GetCallback<ParseObject>() {
             @Override
