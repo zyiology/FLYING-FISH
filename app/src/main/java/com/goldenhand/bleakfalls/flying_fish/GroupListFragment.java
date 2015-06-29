@@ -81,7 +81,11 @@ public class GroupListFragment extends Fragment {
             public void onClick(View v) {
                 ParseObject newGroup = new ParseObject("Group");
                 newGroup.put("Name", "New Group");
+                ArrayList<String> userList = new ArrayList<>();
+                userList.add(mUserId);
+                newGroup.put("UserIds", userList);
                 newGroup.put("groupMessageArray", new ArrayList<>());
+                newGroup.put("admin", mUserId);
                 newGroup.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
@@ -116,20 +120,6 @@ public class GroupListFragment extends Fragment {
             }
         });
 
-
-        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                ParseObject group = (ParseObject) lv.getItemAtPosition(position);
-                Intent i = new Intent(getActivity(), EditGroupActivity.class);
-                i.putExtra(EditGroupActivity.GROUP_OBJECT_ID, group.getObjectId());
-                if (mIsRegistered) {
-                    i.putExtra(LoginActivity.REGISTERED_USER_ID,mUserId);
-                }
-                startActivity(i);
-                return true;
-            }
-        });
 
         return rootView;
     }

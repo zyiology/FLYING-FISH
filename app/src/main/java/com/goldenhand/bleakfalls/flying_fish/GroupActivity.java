@@ -1,7 +1,9 @@
 package com.goldenhand.bleakfalls.flying_fish;
 
+import java.util.List;
 import java.util.Locale;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -18,6 +20,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 
 public class GroupActivity extends ActionBarActivity {
@@ -41,6 +49,8 @@ public class GroupActivity extends ActionBarActivity {
     private static boolean mIsRegistered;
     private static String mGroupId;
     private static String mUserId;
+
+    private ParseObject group;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,22 +78,39 @@ public class GroupActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_group, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_edit) {
+            editGroupName();
         }
 
         return super.onOptionsItemSelected(item);
+
+
+    }
+
+    private void editGroupName() {
+        ParseQuery<ParseObject> groupQuery = ParseQuery.getQuery("Group");
+        groupQuery.getInBackground(mGroupId, new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                group = parseObject;
+                if (mUserId.equals(parseObject.getString("admin"))) {
+                    Intent i = new Intent(GroupActivity.this, EditGroupActivity.class);
+                    i.putExtra(EditGroupActivity.GROUP_OBJECT_ID, group.getObjectId());
+                    if (mIsRegistered) {
+                        i.putExtra(LoginActivity.REGISTERED_USER_ID, mUserId);
+                    }
+                    startActivity(i);
+                }
+            }
+        });
     }
 
 

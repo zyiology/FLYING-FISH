@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.GetCallback;
@@ -25,6 +26,8 @@ public class PreGroupActivity extends ActionBarActivity {
     private static String mGroupId;
     private static String mUserId;
 
+    private String groupName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +43,9 @@ public class PreGroupActivity extends ActionBarActivity {
         query.getInBackground(mGroupId, new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject parseObject, ParseException e) {
+                groupName = parseObject.getString("Name");
+                TextView mGroupNameTV = (TextView) findViewById(R.id.group_name);
+                mGroupNameTV.setText(groupName);
                 ArrayList<String> mUserIdArrayList = (ArrayList<String>) parseObject.get("UserIds");
                 if (mUserIdArrayList != null) {
                     if (mUserIdArrayList.contains(mUserId)) {
@@ -51,6 +57,7 @@ public class PreGroupActivity extends ActionBarActivity {
                 }
             }
         });
+
 
 
         Button mJoinGroupButton = (Button) findViewById(R.id.join_group);

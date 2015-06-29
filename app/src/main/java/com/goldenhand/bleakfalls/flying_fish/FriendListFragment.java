@@ -201,11 +201,24 @@ public class FriendListFragment extends Fragment {
                                     List<ParseUser> mFriends = parseUser.getList("friends");
                                     mFriends.remove(friend);
                                     parseUser.put("friends", mFriends);
+
                                     parseUser.saveInBackground(new SaveCallback() {
                                         @Override
                                         public void done(ParseException e) {
+
                                             mFriendList.remove(friend);
                                             updateAdapter();
+
+                                            List<ParseUser> otherFriends = friend.getList("friends");
+                                            otherFriends.remove(parseUser);
+                                            friend.put("friends", otherFriends);
+
+                                            friend.saveInBackground(new SaveCallback() {
+                                                @Override
+                                                public void done(ParseException e) {
+
+                                                }
+                                            });
                                         }
                                     });
                                 }

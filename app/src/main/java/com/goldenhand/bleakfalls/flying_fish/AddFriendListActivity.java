@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -32,6 +33,9 @@ public class AddFriendListActivity extends ActionBarActivity {
 
     static List<ParseUser> mUserList;
 
+    private Toast toast;
+    Boolean notifExists = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,12 +43,16 @@ public class AddFriendListActivity extends ActionBarActivity {
 
         mUserId = getIntent().getStringExtra(USER_ID);
 
+        toast = Toast.makeText(this,"",Toast.LENGTH_SHORT);
+
         ParseQuery<ParseUser> selfQuery = ParseUser.getQuery();
         selfQuery.getInBackground(mUserId, new GetCallback<ParseUser>() {
             @Override
             public void done(ParseUser parseUser, ParseException e) {
                 mFriends = (List<ParseUser>) parseUser.get("friends");
                 currentUser = parseUser;
+
+
 
                 ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
                 userQuery.findInBackground(new FindCallback<ParseUser>() {
@@ -73,23 +81,37 @@ public class AddFriendListActivity extends ActionBarActivity {
         usernameLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ParseUser selectedUser = (ParseUser) usernameLV.getItemAtPosition(position);
 
-                if (!mFriends.contains(selectedUser) && selectedUser != currentUser) {
+                final ParseUser selectedUser = (ParseUser) usernameLV.getItemAtPosition(position);
 
-                    mFriends.add(selectedUser);
-                    currentUser.put("friends",mFriends);
-                    currentUser.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            NavUtils.navigateUpTo(AddFriendListActivity.this, new Intent(AddFriendListActivity.this, FishActivity.class));
-                            Intent navigateUpIntent = new Intent();
-                            navigateUpIntent.putExtra(LoginActivity.REGISTERED_USER_ID, currentUser.getObjectId());
-                            setResult(RESULT_OK, navigateUpIntent);
-                            finish();
+                ParseQuery<ParseObject> notifQuery = ParseQuery.getQuery("Notification");
+                notifQuery.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(List<ParseObject> list, ParseException e) {
+                        for (ParseObject notification: list) {
+                            if (notification.getString("to").equals(selectedUser.getObjectId())) {
+                                notifExists = true;
+                            }
                         }
-                    });
-                }
+
+                        if (!mFriends.contains(selectedUser) && selectedUser != currentUser && !notifExists) {
+                            ParseObject friendNotif = new ParseObject("Notification");
+                            friendNotif.put("isFriendNotif",true);
+                            friendNotif.put("from", mUserId);
+                            friendNotif.put("fromName", currentUser.getUsername());
+                            friendNotif.put("to", selectedUser.getObjectId());
+                            friendNotif.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    toast.setText(R.string.toast_notif);
+                                    toast.show();
+                                }
+                            });
+                        }
+                    }
+                });
+
+
 
             }
         });

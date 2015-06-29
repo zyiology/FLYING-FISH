@@ -4,9 +4,9 @@
     <string name="app_name">FLYING-FISH</string>
     <string name="title_section1">Groups</string>
     <string name="title_section2">Friends</string>
-    <string name="title_section3">Announcements</string>
+    <string name="title_section3">Notifications</string>
     <string name="title_section4">Group Chat</string>
-    <string name="title_section5">Announcements</string>
+    <string name="title_section5">Notifications</string>
     <string name="title_section6">Files and Images</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -24,6 +24,7 @@
     <!--GroupFragment-->
     <string name="add_group">+</string>
     <string name="title_activity_edit_group">EditGroupActivity</string>
+    <string name="edit_group_name">Change group name</string>
 
     <!--EditGroupActivity-->
     <string name="save_changes">Save Changes</string>
@@ -39,6 +40,13 @@
 
     <!--AddFriendList-->
     <string name="choose_friend">Choose a friend</string>
+    <string name="toast_notif">Friend request sent!</string>
+
+    <!--Pregroup-->
+    <string name="admin">Admin: </string>
+
+    <!--GroupDetailFragment-->
+    <string name="users">Users</string>
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

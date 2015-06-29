@@ -2,6 +2,7 @@ package com.goldenhand.bleakfalls.flying_fish;
 
 import java.util.Locale;
 
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
@@ -179,8 +180,11 @@ public class FishActivity extends ActionBarActivity implements ActionBar.TabList
                 case 1:
                     FriendListFragment flf = new FriendListFragment();
                     flf.newInstance(position+1,mUserId,mIsRegistered);
-                    System.out.println("USER ID IN FISHACTIVITY: "+mUserId);
                     return flf;
+                case 2:
+                    NotificationFragment nf = new NotificationFragment();
+                    nf.newInstance(position+1,mUserId,mIsRegistered);
+                    return nf;
             }
             return PlaceholderFragment.newInstance(position + 1);
         }
