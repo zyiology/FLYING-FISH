@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NavUtils;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -125,8 +126,9 @@ public class NotificationFragment extends Fragment {
                                                             selectedNotification.deleteInBackground(new DeleteCallback() {
                                                                 @Override
                                                                 public void done(ParseException e) {
-                                                                    notificationAdapter.notifyDataSetChanged();
-
+                                                                    //notificationAdapter.notifyDataSetChanged();
+                                                                    ViewPager vp =(ViewPager) getActivity().findViewById(R.id.pager);
+                                                                    vp.getAdapter().notifyDataSetChanged();
                                                                 }
                                                             });
 

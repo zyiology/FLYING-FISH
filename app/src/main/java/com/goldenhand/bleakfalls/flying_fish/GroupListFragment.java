@@ -86,6 +86,7 @@ public class GroupListFragment extends Fragment {
                 newGroup.put("UserIds", userList);
                 newGroup.put("groupMessageArray", new ArrayList<>());
                 newGroup.put("admin", mUserId);
+                newGroup.put("ImagesLikes", new ArrayList<ArrayList<String>>());
                 newGroup.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {

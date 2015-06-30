@@ -206,6 +206,11 @@ public class FishActivity extends ActionBarActivity implements ActionBar.TabList
             }
             return null;
         }
+
+        @Override
+        public int getItemPosition(Object object){
+            return POSITION_NONE;
+        }
     }
 
     public void LogOut() {

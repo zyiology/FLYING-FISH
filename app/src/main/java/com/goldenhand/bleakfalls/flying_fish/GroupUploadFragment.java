@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -84,15 +85,46 @@ public class GroupUploadFragment extends Fragment {
         ParseQuery query = ParseQuery.getQuery("Group");
         query.getInBackground(mGroupId, new GetCallback<ParseObject>() {
             @Override
-            public void done(ParseObject parseObject, ParseException e) {
-                ArrayList<String> mImageText = (ArrayList<String>) parseObject.get("Images");
+            public void done(final ParseObject parseObject, ParseException e) {
+                final ArrayList<String> mImageText = (ArrayList<String>) parseObject.get("Images");
                 ArrayList<Bitmap> images = new ArrayList<Bitmap>();
                 if (mImageText != null) {
                     for (int i=0;i<mImageText.size();i++) {
                         images.add(stringToBitmap(mImageText.get(i)));
                     }
-                    GridViewAdapter gridAdapter = new GridViewAdapter(getActivity(), R.layout.fragment_fish_group_upload_item, images);
+                    ArrayList imagesLikes = (ArrayList) parseObject.get("ImagesLikes");
+                    GridViewAdapter gridAdapter = new GridViewAdapter(getActivity(), R.layout.fragment_fish_group_upload_item, images, imagesLikes);
                     gridView.setAdapter(gridAdapter);
+
+                    gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            Bitmap imageClicked = (Bitmap) gridView.getItemAtPosition(position);
+                            if (mImageText.contains(bitmapToString(imageClicked))) {
+                                int indexOfImage = mImageText.indexOf(bitmapToString(imageClicked));
+                                ArrayList imagesLikes = (ArrayList) parseObject.get("ImagesLikes");
+                                ArrayList clickedImageLikes = (ArrayList) imagesLikes.get(indexOfImage);
+                                if (!clickedImageLikes.contains(mUserId)) {
+                                    clickedImageLikes.add(mUserId);
+                                    imagesLikes.remove(indexOfImage);
+                                    imagesLikes.add(indexOfImage, clickedImageLikes);
+                                    parseObject.put("ImagesLikes", imagesLikes);
+                                    parseObject.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            ViewPager vp = (ViewPager) getActivity().findViewById(R.id.pager);
+                                            vp.getAdapter().notifyDataSetChanged();
+
+                                            Toast.makeText(getActivity(), "LIKED!", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                                else {
+                                    Toast.makeText(getActivity(), "YOU HAVE LIKED THIS BEFORE...", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }
+                    });
                 } else {
                     //GridViewAdapter gridAdapter = new GridViewAdapter(getActivity(), R.layout.fragment_fish_group_upload_item, getData());
                     //gridView.setAdapter(gridAdapter);
@@ -135,6 +167,8 @@ public class GroupUploadFragment extends Fragment {
                             }
                             images.add(newImage);
                             parseObject.put("Images", images);
+                            ArrayList imagesLikes = (ArrayList<ArrayList<String>>) parseObject.get("ImagesLikes");
+                            imagesLikes.add(new ArrayList<String>());
                             parseObject.saveInBackground(new SaveCallback() {
                                 @Override
                                 public void done(ParseException e) {
@@ -169,27 +203,18 @@ public class GroupUploadFragment extends Fragment {
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
-    /*private ArrayList<ImageItem> getData() {
-        final ArrayList<ImageItem> imageItems = new ArrayList<>();
-        TypedArray imgs = getResources().obtainTypedArray(R.array.image_ids);
-        for (int i = 0; i < imgs.length(); i++) {
-            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), imgs.getResourceId(i, -1));
-            imageItems.add(bitmap);
-        }
-        imgs.recycle();
-        return imageItems;
-    }*/
-
     public class GridViewAdapter extends ArrayAdapter {
         private Context context;
         private int layoutResourceId;
-        private ArrayList data = new ArrayList();
+        private ArrayList images = new ArrayList();
+        private ArrayList imagesLikes = new ArrayList();
 
-        public GridViewAdapter(Context context, int layoutResourceId, ArrayList data) {
-            super(context, layoutResourceId, data);
+        public GridViewAdapter(Context context, int layoutResourceId, ArrayList images, ArrayList imagesLikes) {
+            super(context, layoutResourceId, images);
             this.layoutResourceId = layoutResourceId;
             this.context = context;
-            this.data = data;
+            this.images = images;
+            this.imagesLikes = imagesLikes;
         }
 
         @Override
@@ -202,19 +227,30 @@ public class GroupUploadFragment extends Fragment {
                 row = inflater.inflate(layoutResourceId, parent, false);
                 holder = new ViewHolder();
                 holder.image = (ImageView) row.findViewById(R.id.image);
+                holder.image_likes = (TextView) row.findViewById(R.id.likes_text);
                 row.setTag(holder);
             } else {
                 holder = (ViewHolder) row.getTag();
             }
 
-            Bitmap item = (Bitmap) data.get(position);
+            Bitmap item = (Bitmap) images.get(position);
             holder.image.setImageBitmap(item);
+
+            ArrayList<String> currentImageLikes = (ArrayList<String>) imagesLikes.get(position);
+            if (currentImageLikes!= null) {
+                holder.image_likes.setText(Integer.toString(currentImageLikes.size()));
+            }
+            else {
+                holder.image_likes.setText("0");
+            }
+
+
             return row;
         }
 
         class ViewHolder {
-            TextView imageTitle;
             ImageView image;
+            TextView image_likes;
         }
     }
 }
