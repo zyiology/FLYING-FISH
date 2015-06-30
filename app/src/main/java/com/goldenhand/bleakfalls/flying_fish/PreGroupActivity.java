@@ -42,6 +42,8 @@ public class PreGroupActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pre_group);
 
+        getSupportActionBar().hide();
+
         toast = Toast.makeText(this,"",Toast.LENGTH_SHORT);
 
         if (getIntent().getExtras().containsKey(LoginActivity.REGISTERED_USER_ID)) {
@@ -69,8 +71,6 @@ public class PreGroupActivity extends ActionBarActivity {
                 }
             }
         });
-
-
 
         Button mJoinGroupButton = (Button) findViewById(R.id.join_group);
             mJoinGroupButton.setOnClickListener(new View.OnClickListener() {

@@ -41,6 +41,8 @@ public class AddFriendListActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_friend_list);
 
+        getSupportActionBar().hide();
+
         mUserId = getIntent().getStringExtra(USER_ID);
 
         toast = Toast.makeText(this,"",Toast.LENGTH_SHORT);
@@ -89,7 +91,7 @@ public class AddFriendListActivity extends ActionBarActivity {
                     @Override
                     public void done(List<ParseObject> list, ParseException e) {
                         for (ParseObject notification: list) {
-                            if (notification.getBoolean("isFriendNotif") && notification.getString("to").equals(selectedUser.getObjectId())) {
+                            if (notification.getBoolean("isFriendNotif") && notification.getString("to").equals(selectedUser.getObjectId()) && notification.getString("from").equals(mUserId)) {
                                 notifExists = true;
                             }
                         }

@@ -4,4 +4,7 @@
     tools:context="com.goldenhand.bleakfalls.flying_fish.GroupActivity">
     <item android:id="@+id/action_edit" android:title="@string/edit_group_name"
         android:orderInCategory="100" app:showAsAction="never" />
+
+    <item android:id="@+id/action_delete" android:title="@string/delete_group"
+        android:orderInCategory="100" app:showAsAction="never" />
 </menu>

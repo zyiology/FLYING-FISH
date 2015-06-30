@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">FLYING-FISH</string>
+    <string name="app_name">FLYING FISH</string>
     <string name="title_section1">Groups</string>
     <string name="title_section2">Friends</string>
     <string name="title_section3">Notifications</string>
@@ -14,21 +14,29 @@
 
     <string name="logout">Logout</string>
 
+    <string name="app_launch">Flying Fish</string>
+
     <!--ChatActivity-->
     <string name="send">Send</string>
+    <string name="toast_empty_error">Message field cannot be blank!</string>
 
     <!--Chat Item-->
     <string name="profile_me">My Profile Pic</string>
     <string name="profile_other">Other Profile Pic</string>
 
+    <!--Group Activity-->
+    <string name="not_admin">You are not the admin!</string>
+    <string name="edit_group_name">Change group name</string>
+    <string name="delete_group">Delete group</string>
+
     <!--GroupFragment-->
     <string name="add_group">+</string>
     <string name="title_activity_edit_group">EditGroupActivity</string>
-    <string name="edit_group_name">Change group name</string>
+
 
     <!--EditGroupActivity-->
     <string name="save_changes">Save Changes</string>
-    <string name="title_activity_group">GroupActivity</string>
+    <string name="title_activity_group"></string>
 
     <!--GroupDetailFragment-->
     <string name="join_group">Join Group</string>

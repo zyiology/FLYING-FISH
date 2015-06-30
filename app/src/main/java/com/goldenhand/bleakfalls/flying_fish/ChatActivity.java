@@ -38,6 +38,8 @@ public class ChatActivity extends ActionBarActivity {
     private EditText messageET;
     private Button sendButton;
 
+    private Toast toast;
+
     private ListView chatLV;
     private ArrayList<ParseObject> messageArrayList;
     private List<ParseObject> chatMessageArray;
@@ -47,6 +49,10 @@ public class ChatActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        getSupportActionBar().hide();
+
+        toast = Toast.makeText(this,"",Toast.LENGTH_SHORT);
 
         userId = getIntent().getStringExtra(LoginActivity.REGISTERED_USER_ID);
         friendId = getIntent().getStringExtra(FriendListFragment.SELECTED_USER_ID);
@@ -78,44 +84,50 @@ public class ChatActivity extends ActionBarActivity {
             public void onClick(View v) {
                 String body = messageET.getText().toString();
 
-                final ParseObject newChatMessage = new ParseObject("ChatMessage");
-                newChatMessage.put("sender",userId);
-                newChatMessage.put("message", body);
+                if (!body.equals("")) {
 
-                ParseQuery<ParseUser> selfQuery = ParseUser.getQuery();
-                selfQuery.getInBackground(userId, new GetCallback<ParseUser>() {
-                    @Override
-                    public void done(ParseUser parseUser, ParseException e) {
-                        if (e == null) {
-                            newChatMessage.put("username", parseUser.getUsername());
-                            newChatMessage.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
+                    final ParseObject newChatMessage = new ParseObject("ChatMessage");
+                    newChatMessage.put("sender", userId);
+                    newChatMessage.put("message", body);
 
-                                    ParseQuery<ParseObject> convoQuery = ParseQuery.getQuery("Conversation");
-                                    convoQuery.getInBackground(convoId, new GetCallback<ParseObject>() {
-                                        @Override
-                                        public void done(ParseObject parseObject, ParseException e) {
-                                            List<ParseObject> chatMessageArray = parseObject.getList("chatMessageArray");
-                                            chatMessageArray.add(newChatMessage);
-                                            parseObject.put("chatMessageArray", chatMessageArray);
-                                            parseObject.saveInBackground(new SaveCallback() {
-                                                @Override
-                                                public void done(ParseException e) {
-                                                    receiveMessage();
-                                                }
-                                            });
-                                        }
-                                    });
+                    ParseQuery<ParseUser> selfQuery = ParseUser.getQuery();
+                    selfQuery.getInBackground(userId, new GetCallback<ParseUser>() {
+                        @Override
+                        public void done(ParseUser parseUser, ParseException e) {
+                            if (e == null) {
+                                newChatMessage.put("username", parseUser.getUsername());
+                                newChatMessage.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+
+                                        ParseQuery<ParseObject> convoQuery = ParseQuery.getQuery("Conversation");
+                                        convoQuery.getInBackground(convoId, new GetCallback<ParseObject>() {
+                                            @Override
+                                            public void done(ParseObject parseObject, ParseException e) {
+                                                List<ParseObject> chatMessageArray = parseObject.getList("chatMessageArray");
+                                                chatMessageArray.add(newChatMessage);
+                                                parseObject.put("chatMessageArray", chatMessageArray);
+                                                parseObject.saveInBackground(new SaveCallback() {
+                                                    @Override
+                                                    public void done(ParseException e) {
+                                                        receiveMessage();
+                                                    }
+                                                });
+                                            }
+                                        });
 
 
-                                }
-                            });
+                                    }
+                                });
+                            }
                         }
-                    }
-                });
+                    });
 
-                messageET.setText("");
+                    messageET.setText("");
+                } else {
+                    toast.setText(getText(R.string.toast_empty_error));
+                    toast.show();
+                }
             }
         });
 

@@ -105,7 +105,7 @@ public class GroupDetailFragment extends Fragment {
                 groupQuery.getInBackground(mGroupId, new GetCallback<ParseObject>() {
                     @Override
                     public void done(ParseObject parseObject, ParseException e) {
-                        if (parseObject.getString("admin").equals(mUserId)) {
+                        if (parseObject.getString("admin").equals(mUserId) && !selectedUser.getObjectId().equals(mUserId)) {
                             alertDialog = confirmUserKickDialog(selectedUser, parseObject);
                             alertDialog.show();
                         }

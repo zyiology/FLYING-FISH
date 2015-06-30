@@ -28,6 +28,8 @@ public class EditGroupActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_group);
+
+        getSupportActionBar().hide();
         //TextView test = (TextView) findViewById(R.id.test);
         //test.setText(getIntent().getStringExtra(GROUP_OBJECT_ID));
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Group");
@@ -53,6 +55,7 @@ public class EditGroupActivity extends ActionBarActivity {
                                         i.putExtra(LoginActivity.REGISTERED_USER_ID, getIntent().getStringExtra(LoginActivity.REGISTERED_USER_ID));
                                     }
                                     startActivity(i);
+                                    finish();
                                 }
                             });
                         }

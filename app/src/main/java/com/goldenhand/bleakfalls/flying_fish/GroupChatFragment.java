@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -36,6 +37,8 @@ public class GroupChatFragment extends Fragment {
     private ChatListAdapter chatListAdapter;
     private List<ParseObject> chatMessageArray;
 
+    private Toast toast;
+
 
     public GroupChatFragment newInstance(int sectionNumber, String userId, Boolean isRegistered, String groupId) {
         GroupChatFragment fragment = new GroupChatFragment();
@@ -55,6 +58,8 @@ public class GroupChatFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        toast = Toast.makeText(getActivity(),"",Toast.LENGTH_SHORT);
     }
 
     @Override
@@ -91,42 +96,48 @@ public class GroupChatFragment extends Fragment {
             public void onClick(View v) {
                 String body = messageET.getText().toString();
 
-                final ParseObject newChatMessage = new ParseObject("ChatMessage");
-                newChatMessage.put("sender",mUserId);
-                newChatMessage.put("message", body);
+                if (!body.equals("")) {
 
-                ParseQuery<ParseUser> selfQuery = ParseUser.getQuery();
-                selfQuery.getInBackground(mUserId, new GetCallback<ParseUser>() {
-                    @Override
-                    public void done(ParseUser parseUser, ParseException e) {
-                        newChatMessage.put("username", parseUser.getUsername());
-                        newChatMessage.saveInBackground(new SaveCallback() {
-                            @Override
-                            public void done(ParseException e) {
+                    final ParseObject newChatMessage = new ParseObject("ChatMessage");
+                    newChatMessage.put("sender", mUserId);
+                    newChatMessage.put("message", body);
 
-                                ParseQuery<ParseObject> groupQuery = ParseQuery.getQuery("Group");
-                                groupQuery.getInBackground(mGroupId, new GetCallback<ParseObject>() {
-                                    @Override
-                                    public void done(ParseObject parseObject, ParseException e) {
-                                        List<ParseObject> chatMessageArray = parseObject.getList("groupMessageArray");
-                                        chatMessageArray.add(newChatMessage);
-                                        parseObject.put("groupMessageArray", chatMessageArray);
-                                        parseObject.saveInBackground(new SaveCallback() {
-                                            @Override
-                                            public void done(ParseException e) {
-                                                receiveMessage();
-                                            }
-                                        });
-                                    }
-                                });
+                    ParseQuery<ParseUser> selfQuery = ParseUser.getQuery();
+                    selfQuery.getInBackground(mUserId, new GetCallback<ParseUser>() {
+                        @Override
+                        public void done(ParseUser parseUser, ParseException e) {
+                            newChatMessage.put("username", parseUser.getUsername());
+                            newChatMessage.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+
+                                    ParseQuery<ParseObject> groupQuery = ParseQuery.getQuery("Group");
+                                    groupQuery.getInBackground(mGroupId, new GetCallback<ParseObject>() {
+                                        @Override
+                                        public void done(ParseObject parseObject, ParseException e) {
+                                            List<ParseObject> chatMessageArray = parseObject.getList("groupMessageArray");
+                                            chatMessageArray.add(newChatMessage);
+                                            parseObject.put("groupMessageArray", chatMessageArray);
+                                            parseObject.saveInBackground(new SaveCallback() {
+                                                @Override
+                                                public void done(ParseException e) {
+                                                    receiveMessage();
+                                                }
+                                            });
+                                        }
+                                    });
 
 
-                            }
-                        });
-                    }
-                });
+                                }
+                            });
+                        }
+                    });
 
-                messageET.setText("");
+                    messageET.setText("");
+                } else {
+                    toast.setText(getText(R.string.toast_empty_error));
+                    toast.show();
+                }
             }
         });
 

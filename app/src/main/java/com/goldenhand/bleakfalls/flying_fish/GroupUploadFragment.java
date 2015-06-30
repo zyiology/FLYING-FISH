@@ -178,6 +178,8 @@ public class GroupUploadFragment extends Fragment {
                                         }
                                         i.putExtra(GroupActivity.GROUP_ID,mGroupId);
                                         startActivity(i);
+                                        getActivity().finish();
+
                                 }
                             });
                         }

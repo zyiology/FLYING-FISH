@@ -14,9 +14,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
@@ -79,32 +81,39 @@ public class GroupListFragment extends Fragment {
         mAddGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ParseObject newGroup = new ParseObject("Group");
-                newGroup.put("Name", "New Group");
-                ArrayList<String> userList = new ArrayList<>();
-                userList.add(mUserId);
-                newGroup.put("UserIds", userList);
-                newGroup.put("groupMessageArray", new ArrayList<>());
-                newGroup.put("admin", mUserId);
-                newGroup.put("ImagesLikes", new ArrayList<ArrayList<String>>());
-                newGroup.saveInBackground(new SaveCallback() {
+                ParseQuery<ParseUser> userQuery  = ParseUser.getQuery();
+                userQuery.getInBackground(mUserId, new GetCallback<ParseUser>() {
                     @Override
-                    public void done(ParseException e) {
-                        query.findInBackground(new FindCallback<ParseObject>() {
+                    public void done(ParseUser parseUser, ParseException e) {
+                        ParseObject newGroup = new ParseObject("Group");
+                        newGroup.put("Name", parseUser.getUsername()+"'s group");
+                        ArrayList<String> userList = new ArrayList<>();
+                        userList.add(mUserId);
+                        newGroup.put("UserIds", userList);
+                        newGroup.put("groupMessageArray", new ArrayList<>());
+                        newGroup.put("admin", mUserId);
+                        newGroup.put("ImagesLikes", new ArrayList<ArrayList<String>>());
+                        newGroup.saveInBackground(new SaveCallback() {
                             @Override
-                            public void done(List<ParseObject> list, ParseException e) {
-                                if (e == null) {
-                                    mGroupList = list;
-                                    GroupAdapter mGroupAdapter = new GroupAdapter(getActivity(), R.layout.fragment_fish_groups_item, mGroupList);
-                                    System.out.println("DONNNNNNNNNNNNNNNNNNNNE");
-                                    lv.setAdapter(mGroupAdapter);
-                                } else {
-                                    System.out.println("FAILURE U IDIOT");
-                                }
+                            public void done(ParseException e) {
+                                query.findInBackground(new FindCallback<ParseObject>() {
+                                    @Override
+                                    public void done(List<ParseObject> list, ParseException e) {
+                                        if (e == null) {
+                                            mGroupList = list;
+                                            GroupAdapter mGroupAdapter = new GroupAdapter(getActivity(), R.layout.fragment_fish_groups_item, mGroupList);
+                                            System.out.println("DONNNNNNNNNNNNNNNNNNNNE");
+                                            lv.setAdapter(mGroupAdapter);
+                                        } else {
+                                            System.out.println("FAILURE U IDIOT");
+                                        }
+                                    }
+                                });
                             }
                         });
                     }
                 });
+
             }
         });
 

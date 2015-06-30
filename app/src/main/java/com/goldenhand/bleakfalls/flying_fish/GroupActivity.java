@@ -20,7 +20,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -50,12 +52,16 @@ public class GroupActivity extends ActionBarActivity {
     private static String mGroupId;
     private static String mUserId;
 
+    private Toast toast;
+
     private ParseObject group;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group);
+
+        toast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
 
         if (getIntent().getExtras().containsKey(LoginActivity.REGISTERED_USER_ID)) {
             mIsRegistered = true;
@@ -90,10 +96,36 @@ public class GroupActivity extends ActionBarActivity {
             editGroupName();
         }
 
+        if (id == R.id.action_delete) {
+            deleteGroup();
+        }
+
         return super.onOptionsItemSelected(item);
 
 
     }
+
+
+    private void deleteGroup() {
+        ParseQuery<ParseObject> groupQuery = ParseQuery.getQuery("Group");
+        groupQuery.getInBackground(mGroupId, new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                if (mUserId.equals(parseObject.getString("admin"))) {
+                    parseObject.deleteInBackground(new DeleteCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            Intent i = new Intent(getApplication(), FishActivity.class);
+                            i.putExtra(LoginActivity.REGISTERED_USER_ID, mUserId);
+                            startActivity(i);
+                            finish();
+                        }
+                    });
+                }
+            }
+        });
+    }
+
 
     private void editGroupName() {
         ParseQuery<ParseObject> groupQuery = ParseQuery.getQuery("Group");
@@ -108,6 +140,9 @@ public class GroupActivity extends ActionBarActivity {
                         i.putExtra(LoginActivity.REGISTERED_USER_ID, mUserId);
                     }
                     startActivity(i);
+                } else {
+                    toast.setText(getText(R.string.not_admin));
+                    toast.show();
                 }
             }
         });
