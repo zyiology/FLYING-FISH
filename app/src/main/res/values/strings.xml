@@ -50,6 +50,7 @@
     <!--NotificationFragment-->
     <string name="friend_added">Friend added!</string>
     <string name="group_member_added">Group member added!</string>
+    <string name="kick_user">Kick</string>
 
 
     <!--GroupDetailFragment-->
