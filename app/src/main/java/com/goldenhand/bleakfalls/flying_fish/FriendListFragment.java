@@ -85,6 +85,7 @@ public class FriendListFragment extends Fragment {
                 mFriendAdapter = new FriendAdapter(getActivity(), R.layout.fragment_friend_list_item, mFriendList);
                 friendsLV = (ListView) rootView.findViewById(R.id.friends_list);
                 friendsLV.setAdapter(mFriendAdapter);
+                updateAdapter();
                 setUpFriendsOnClick();
             }
         });
@@ -179,10 +180,16 @@ public class FriendListFragment extends Fragment {
                 return false;
             }
         });
+
+
     }
 
     public void updateAdapter() {
         mFriendAdapter.notifyDataSetChanged();
+    }
+
+    public FriendAdapter getAdapter() {
+        return mFriendAdapter;
     }
 
     private AlertDialog confirmFriendDeleteDialog(final ParseUser friend) {

@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
@@ -39,6 +40,10 @@ public class NotificationFragment extends Fragment {
     private List<ParseObject> myFriends;
     private List<ParseObject> theirFriends;
 
+    private List<String> groupMembers;
+
+    private Toast toast;
+
     public NotificationFragment newInstance(int sectionNumber, String userId, boolean isRegistered) {
         NotificationFragment fragment = new NotificationFragment();
         Bundle args = new Bundle();
@@ -63,6 +68,8 @@ public class NotificationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_notification, container, false);
+
+        toast = Toast.makeText(getActivity(),"",Toast.LENGTH_SHORT);
 
         ParseQuery<ParseObject> notifQuery = ParseQuery.getQuery("Notification");
         notifQuery.findInBackground(new FindCallback<ParseObject>() {
@@ -135,6 +142,28 @@ public class NotificationFragment extends Fragment {
                             }
                         }
                     });
+                } else {
+                    ParseQuery<ParseObject> groupQuery = ParseQuery.getQuery("Group");
+                    groupQuery.getInBackground(selectedNotification.getString("groupId"), new GetCallback<ParseObject>() {
+                        @Override
+                        public void done(ParseObject parseObject, ParseException e) {
+                            groupMembers = parseObject.getList("UserIds");
+                            groupMembers.add(selectedNotification.getString("from"));
+                            parseObject.put("UserIds", groupMembers);
+                            parseObject.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    myNotifications.remove(selectedNotification);
+                                    selectedNotification.deleteInBackground(new DeleteCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            notificationAdapter.notifyDataSetChanged();
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
                 }
 
             }
@@ -167,7 +196,7 @@ public class NotificationFragment extends Fragment {
             if (notification.getBoolean("isFriendNotif")) {
                 holder.notificationTextView.setText(notification.getString("fromName")+" wants to be your friend!");
             } else {
-                holder.notificationTextView.setText(notification.getString("from")+" wants to join group "+
+                holder.notificationTextView.setText(notification.getString("fromName")+" wants to join group "+
                                                     notification.getString("groupName")+"!");
             }
 

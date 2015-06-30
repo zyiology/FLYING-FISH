@@ -89,7 +89,7 @@ public class AddFriendListActivity extends ActionBarActivity {
                     @Override
                     public void done(List<ParseObject> list, ParseException e) {
                         for (ParseObject notification: list) {
-                            if (notification.getString("to").equals(selectedUser.getObjectId())) {
+                            if (notification.getBoolean("isFriendNotif") && notification.getString("to").equals(selectedUser.getObjectId())) {
                                 notifExists = true;
                             }
                         }
@@ -103,10 +103,13 @@ public class AddFriendListActivity extends ActionBarActivity {
                             friendNotif.saveInBackground(new SaveCallback() {
                                 @Override
                                 public void done(ParseException e) {
-                                    toast.setText(R.string.toast_notif);
+                                    toast.setText(R.string.toast_request_success);
                                     toast.show();
                                 }
                             });
+                        } else {
+                            toast.setText(R.string.toast_request_spam);
+                            toast.show();
                         }
                     }
                 });

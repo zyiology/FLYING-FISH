@@ -40,10 +40,17 @@
 
     <!--AddFriendList-->
     <string name="choose_friend">Choose a friend</string>
-    <string name="toast_notif">Friend request sent!</string>
+    <string name="toast_request_success">Friend request sent!</string>
+    <string name="toast_request_spam">Friend request already sent!</string>
 
     <!--Pregroup-->
-    <string name="admin">Admin: </string>
+    <string name="toast_group_success">Group request sent!</string>
+    <string name="toast_group_spam">Group request already sent!</string>
+
+    <!--NotificationFragment-->
+    <string name="friend_added">Friend added!</string>
+    <string name="group_member_added">Group member added!</string>
+
 
     <!--GroupDetailFragment-->
     <string name="users">Users</string>

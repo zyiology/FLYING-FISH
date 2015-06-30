@@ -128,8 +128,6 @@ public class FishActivity extends ActionBarActivity implements ActionBar.TabList
             case R.id.action_logout:
                 LogOut();
                 return true;
-            case R.id.action_settings:
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

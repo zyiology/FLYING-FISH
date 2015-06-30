@@ -10,13 +10,16 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
 
@@ -26,12 +29,20 @@ public class PreGroupActivity extends ActionBarActivity {
     private static String mGroupId;
     private static String mUserId;
 
+    private ParseUser currentUser;
+    private ParseObject currentGroup;
+
     private String groupName;
+    Boolean notifExists = false;
+
+    private Toast toast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pre_group);
+
+        toast = Toast.makeText(this,"",Toast.LENGTH_SHORT);
 
         if (getIntent().getExtras().containsKey(LoginActivity.REGISTERED_USER_ID)) {
             mIsRegistered = true;
@@ -53,6 +64,7 @@ public class PreGroupActivity extends ActionBarActivity {
                         i.putExtra(LoginActivity.REGISTERED_USER_ID, mUserId);
                         i.putExtra(GroupActivity.GROUP_ID, mGroupId);
                         startActivity(i);
+                        finish();
                     }
                 }
             }
@@ -61,38 +73,62 @@ public class PreGroupActivity extends ActionBarActivity {
 
 
         Button mJoinGroupButton = (Button) findViewById(R.id.join_group);
-            mJoinGroupButton.setOnClickListener(new View.OnClickListener()
-            {
+            mJoinGroupButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick (View v){
-                ParseQuery<ParseObject> query = ParseQuery.getQuery("Group");
-                query.getInBackground(mGroupId, new GetCallback<ParseObject>() {
-                    @Override
-                    public void done(ParseObject parseObject, ParseException e) {
-                        if (e == null) {
-                            ArrayList<String> mUserIdArrayList = (ArrayList<String>) parseObject.get("UserIds");
-                            if (mUserIdArrayList == null) {
-                                mUserIdArrayList = new ArrayList<String>();
-                            }
-                            mUserIdArrayList.add(mUserId);
-                            parseObject.put("UserIds", mUserIdArrayList);
-                            parseObject.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                    Toast.makeText(PreGroupActivity.this, "ADDED!", Toast.LENGTH_SHORT).show();
-                                    Intent i = new Intent(PreGroupActivity.this, FishActivity.class);
-                                    if (mIsRegistered) {
-                                        i.putExtra(LoginActivity.REGISTERED_USER_ID, mUserId);
-                                    }
-                                    startActivity(i);
+                    ParseQuery<ParseObject> notifQuery = ParseQuery.getQuery("Notification");
+                    notifQuery.findInBackground(new FindCallback<ParseObject>() {
+                        @Override
+                        public void done(List<ParseObject> list, ParseException e) {
+
+                            for (ParseObject notification: list) {
+                                if (!notification.getBoolean("isFriendNotif") && notification.getString("from").equals(mUserId) && notification.getString("groupId").equals(mGroupId)) {
+                                    notifExists = true;
                                 }
-                            });
-                        } else {
-                            //TODO ANYTHING??
+                            }
+
+                            if (!notifExists) {
+                                ParseQuery<ParseUser> selfQuery = ParseUser.getQuery();
+                                selfQuery.getInBackground(mUserId, new GetCallback<ParseUser>() {
+                                    @Override
+                                    public void done(ParseUser parseUser, ParseException e) {
+                                        currentUser = parseUser;
+
+                                        final ParseObject groupNotif = new ParseObject("Notification");
+                                        groupNotif.put("isFriendNotif", false);
+                                        groupNotif.put("from", mUserId);
+                                        groupNotif.put("fromName", currentUser.getUsername());
+                                        groupNotif.put("groupId", mGroupId);
+
+                                        ParseQuery<ParseObject> groupQuery = ParseQuery.getQuery("Group");
+                                        groupQuery.getInBackground(mGroupId, new GetCallback<ParseObject>() {
+                                            @Override
+                                            public void done(ParseObject parseObject, ParseException e) {
+                                                if (e == null) {
+                                                    currentGroup = parseObject;
+                                                    groupNotif.put("to", currentGroup.getString("admin"));
+                                                    groupNotif.put("groupName", currentGroup.getString("Name"));
+                                                    groupNotif.saveInBackground(new SaveCallback() {
+                                                        @Override
+                                                        public void done(ParseException e) {
+                                                            toast.setText(R.string.toast_group_success);
+                                                            toast.show();
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+
+                            } else {
+                                toast.setText(R.string.toast_group_spam);
+                                toast.show();
+                            }
+
                         }
-                    }
-                });
-            }
+                    });
+                }
             }
         );
     }
